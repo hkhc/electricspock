@@ -129,11 +129,6 @@ public class ElectricSpockInterceptor extends AbstractMethodInterceptor {
                     new RoutingResourceProvider(systemResourceTable, appResourceTable),
                     new RoutingResourceProvider(systemResourceTable));
 
-
-//            ResourceLoader systemResourceLoader =
-//                    sdkEnvironment.getSystemResourceLoader(dependencyResolverFactory.getJarResolver());
-//            parallelUniverseInterface.setUpApplicationState(null,
-//                    testLifecycle, systemResourceLoader, appManifest, config);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e);

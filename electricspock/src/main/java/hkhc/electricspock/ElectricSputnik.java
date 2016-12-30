@@ -64,9 +64,11 @@ public class ElectricSputnik extends Runner implements Filterable, Sortable {
 
     public ElectricSputnik(Class<?> testClass) {
 
+        checkRobolectricVersion();
+
         AndroidManifestFactory androidManifestFactory = new AndroidManifestFactory();
 
-        config = (new ConfigFactory()).getConfig(testClass, null);
+        config = (new ConfigFactory()).getConfig(testClass);
         appManifest = androidManifestFactory.getAppManifest(config);
         instrumentingClassLoaderFactory =
                 new InstrumentingClassLoaderFactory(
@@ -129,6 +131,25 @@ public class ElectricSputnik extends Runner implements Filterable, Sortable {
             }
         }
 
+
+    }
+
+    private void checkRobolectricVersion() {
+
+        if (!isUsingRobolectric_3_2()) {
+            throw new RuntimeException("This version of ElectricSpock supports Robolectric 3.2 only");
+        }
+
+    }
+
+    private boolean isUsingRobolectric_3_2() {
+
+        try {
+            Class.forName("org.robolectric.ConfigMerger");
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
 
     }
 

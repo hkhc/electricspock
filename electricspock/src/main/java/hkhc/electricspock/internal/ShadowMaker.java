@@ -58,41 +58,9 @@ public class ShadowMaker {
         injectEnvironment(sdkEnvironment.getRobolectricClassLoader(), classHandler, sdkEnvironment.getShadowInvalidator());
     }
 
-
-//    public void configureShadows(SdkEnvironment sdkEnvironment, Config config) {
-//        ShadowMap shadowMap = createShadowMap();
-//
-//        if (config != null) {
-//            Class<?>[] shadows = config.shadows();
-//            if (shadows.length > 0) {
-//                shadowMap = shadowMap.newBuilder().addShadowClasses(shadows).build();
-//            }
-//        }
-//
-//        if (InvokeDynamic.ENABLED) {
-//            ShadowMap oldShadowMap = sdkEnvironment.replaceShadowMap(shadowMap);
-//            Set<String> invalidatedClasses = shadowMap.getInvalidatedClasses(oldShadowMap);
-//            sdkEnvironment.getShadowInvalidator().invalidateClasses(invalidatedClasses);
-//        }
-//
-//        ClassHandler classHandler = createClassHandler(sdkEnvironment, shadowMap);
-//        injectEnvironment(sdkEnvironment.getRobolectricClassLoader(), classHandler, sdkEnvironment.getShadowInvalidator());
-//    }
-
     private ShadowMap createShadowMap() {
         return ShadowMap.EMPTY;
     }
-
-//    private ClassHandler getClassHandler(SdkEnvironment sdkEnvironment, ShadowMap shadowMap) {
-//        ClassHandler classHandler;
-//        synchronized (sdkEnvironment) {
-//            classHandler = sdkEnvironment.classHandlersByShadowMap.get(shadowMap);
-//            if (classHandler == null) {
-//                classHandler = new ShadowWrangler(shadowMap);
-//            }
-//        }
-//        return classHandler;
-//    }
 
     /**
      * Create a {@link ClassHandler} appropriate for the given arguments.

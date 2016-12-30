@@ -43,55 +43,22 @@ public class ConfigFactory {
 
     }
 
-    public Config getConfig(Class testClass, Method method) {
+    public Config getConfig(Class testClass) {
 
-        Method m = null;
+        // A hack to create an arbitrary method object for ConfigMerger.
+        // With Spock we cannot have per-method robolectric config,
+        // and ConfigMerge expect a method object to check Config annotation. However, it does
+        // not do a null check. Just we pass something (which has no @Config) to claim it down.
+        Method method = null;
         try {
-            m = getClass().getMethod("getConfig", Class.class, Method.class);
+            method = Object.class.getMethod("wait");
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
             return null;
         }
 
-        return configMerger.getConfig(testClass, m, buildGlobalConfig());
+        return configMerger.getConfig(testClass, method, buildGlobalConfig());
 
-//        Config config = new Config.Builder().build();
-//
-//        Config globalConfig = buildGlobalConfig();
-//        if (globalConfig != null) {
-//            config = new Config.Implementation(config, globalConfig);
-//        }
-//
-//        if (method!=null) {
-//            Config methodClassConfig = method.getDeclaringClass().getAnnotation(Config.class);
-//            if (methodClassConfig != null) {
-//                config = new Config.Implementation(config, methodClassConfig);
-//            }
-//        }
-//
-//        ArrayList<Class> testClassHierarchy = new ArrayList<>();
-////        Class testClass = getTestClass().getJavaClass();
-//
-//        while (testClass != null) {
-//            testClassHierarchy.add(0, testClass);
-//            testClass = testClass.getSuperclass();
-//        }
-//
-//        for (Class clazz : testClassHierarchy) {
-//            Config classConfig = (Config) clazz.getAnnotation(Config.class);
-//            if (classConfig != null) {
-//                config = new Config.Implementation(config, classConfig);
-//            }
-//        }
-//
-//        if (method!=null) {
-//            Config methodConfig = method.getAnnotation(Config.class);
-//            if (methodConfig != null) {
-//                config = new Config.Implementation(config, methodConfig);
-//            }
-//        }
-//
-//        return config;
     }
 
     /**

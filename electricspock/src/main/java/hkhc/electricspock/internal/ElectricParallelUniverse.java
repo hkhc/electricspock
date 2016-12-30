@@ -60,12 +60,19 @@ import java.security.Security;
 import java.util.Map;
 
 public class ElectricParallelUniverse implements ParallelUniverseInterface {
+    private final RobolectricTestRunner robolectricTestRunner;
     private final ShadowsAdapter shadowsAdapter = Robolectric.getShadowsAdapter();
 
     private boolean loggingInitialized = false;
     private SdkConfig sdkConfig;
 
+    // Extra constructor for ElectricSpock
     public ElectricParallelUniverse() {
+        this(null);
+    }
+
+    public ElectricParallelUniverse(RobolectricTestRunner robolectricTestRunner) {
+        this.robolectricTestRunner = robolectricTestRunner;
     }
 
     @Override
