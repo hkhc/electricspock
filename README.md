@@ -11,7 +11,7 @@ Current version of the library is tested with Robolectric 3.1.4.
 The archive of this project is deployed with [jitpack](https://jitpack.io). Add the following to your gradle build script.
 
 Add it in your root build.gradle at the end of repositories:
-g
+
 ```groovy
 	allprojects {
 		repositories {
