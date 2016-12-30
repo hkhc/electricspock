@@ -17,6 +17,8 @@
 
 package hkhc.electricspock.internal;
 
+import org.jetbrains.annotations.NotNull;
+import org.robolectric.ConfigMerger;
 import org.robolectric.annotation.Config;
 
 import java.io.IOException;
@@ -27,50 +29,69 @@ import java.util.Properties;
 
 /**
  * Created by herman on 28/12/2016.
+ * Migrate the config creation code from RobolectricTestRunner
  */
 
 public class ConfigFactory {
 
     private static final String CONFIG_PROPERTIES = "robolectric.properties";
+    private final ConfigMerger configMerger;
+
+    public ConfigFactory() {
+
+        this.configMerger = createConfigMerger();
+
+    }
 
     public Config getConfig(Class testClass, Method method) {
-        Config config = new Config.Builder().build();
 
-        Config globalConfig = buildGlobalConfig();
-        if (globalConfig != null) {
-            config = new Config.Implementation(config, globalConfig);
+        Method m = null;
+        try {
+            m = getClass().getMethod("getConfig", Class.class, Method.class);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+            return null;
         }
 
-        if (method!=null) {
-            Config methodClassConfig = method.getDeclaringClass().getAnnotation(Config.class);
-            if (methodClassConfig != null) {
-                config = new Config.Implementation(config, methodClassConfig);
-            }
-        }
+        return configMerger.getConfig(testClass, m, buildGlobalConfig());
 
-        ArrayList<Class> testClassHierarchy = new ArrayList<>();
-//        Class testClass = getTestClass().getJavaClass();
-
-        while (testClass != null) {
-            testClassHierarchy.add(0, testClass);
-            testClass = testClass.getSuperclass();
-        }
-
-        for (Class clazz : testClassHierarchy) {
-            Config classConfig = (Config) clazz.getAnnotation(Config.class);
-            if (classConfig != null) {
-                config = new Config.Implementation(config, classConfig);
-            }
-        }
-
-        if (method!=null) {
-            Config methodConfig = method.getAnnotation(Config.class);
-            if (methodConfig != null) {
-                config = new Config.Implementation(config, methodConfig);
-            }
-        }
-
-        return config;
+//        Config config = new Config.Builder().build();
+//
+//        Config globalConfig = buildGlobalConfig();
+//        if (globalConfig != null) {
+//            config = new Config.Implementation(config, globalConfig);
+//        }
+//
+//        if (method!=null) {
+//            Config methodClassConfig = method.getDeclaringClass().getAnnotation(Config.class);
+//            if (methodClassConfig != null) {
+//                config = new Config.Implementation(config, methodClassConfig);
+//            }
+//        }
+//
+//        ArrayList<Class> testClassHierarchy = new ArrayList<>();
+////        Class testClass = getTestClass().getJavaClass();
+//
+//        while (testClass != null) {
+//            testClassHierarchy.add(0, testClass);
+//            testClass = testClass.getSuperclass();
+//        }
+//
+//        for (Class clazz : testClassHierarchy) {
+//            Config classConfig = (Config) clazz.getAnnotation(Config.class);
+//            if (classConfig != null) {
+//                config = new Config.Implementation(config, classConfig);
+//            }
+//        }
+//
+//        if (method!=null) {
+//            Config methodConfig = method.getAnnotation(Config.class);
+//            if (methodConfig != null) {
+//                config = new Config.Implementation(config, methodConfig);
+//            }
+//        }
+//
+//        return config;
     }
 
     /**
@@ -83,7 +104,7 @@ public class ConfigFactory {
      * @return global {@link Config} object
      */
     private Config buildGlobalConfig() {
-        return Config.Implementation.fromProperties(getConfigProperties());
+        return Config.Builder.defaults().build();
     }
 
     private Properties getConfigProperties() {
@@ -97,4 +118,18 @@ public class ConfigFactory {
             throw new RuntimeException(e);
         }
     }
+
+    /**
+     * Create a {@link ConfigMerger} for calculating the {@link Config} tests.
+     *
+     * Custom TestRunner subclasses may wish to override this method to provide alternate configuration.
+     *
+     * @return an {@link ConfigMerger}.
+     * @since robolectric-3.2
+     */
+    @NotNull
+    private ConfigMerger createConfigMerger() {
+        return new ConfigMerger();
+    }
+
 }

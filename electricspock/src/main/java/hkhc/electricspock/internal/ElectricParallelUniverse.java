@@ -18,10 +18,11 @@
 package hkhc.electricspock.internal;
 
 /**
- * Created by herman on 27/12/2016.
+ * Created by herman on 30/12/2016.
  */
 
 import android.app.Application;
+import android.app.LoadedApk;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
@@ -33,6 +34,7 @@ import android.os.Looper;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.robolectric.Robolectric;
+import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.ShadowsAdapter;
 import org.robolectric.TestLifecycle;
@@ -42,36 +44,28 @@ import org.robolectric.internal.SdkConfig;
 import org.robolectric.internal.fakes.RoboInstrumentation;
 import org.robolectric.manifest.ActivityData;
 import org.robolectric.manifest.AndroidManifest;
-import org.robolectric.res.OverlayResourceLoader;
-import org.robolectric.res.PackageResourceLoader;
 import org.robolectric.res.Qualifiers;
 import org.robolectric.res.ResName;
 import org.robolectric.res.ResourceIndex;
-import org.robolectric.res.ResourceLoader;
-import org.robolectric.res.ResourcePath;
-import org.robolectric.res.RoutingResourceLoader;
+import org.robolectric.res.ResourceProvider;
 import org.robolectric.res.builder.DefaultPackageManager;
 import org.robolectric.res.builder.RobolectricPackageManager;
 import org.robolectric.shadows.ShadowLooper;
 import org.robolectric.util.ApplicationTestUtil;
-import org.robolectric.util.Pair;
 import org.robolectric.util.ReflectionHelpers;
 import org.robolectric.util.Scheduler;
 
 import java.lang.reflect.Method;
 import java.security.Security;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-public class RoboParallelUniverse implements ParallelUniverseInterface {
+public class ElectricParallelUniverse implements ParallelUniverseInterface {
     private final ShadowsAdapter shadowsAdapter = Robolectric.getShadowsAdapter();
 
     private boolean loggingInitialized = false;
     private SdkConfig sdkConfig;
 
-    public RoboParallelUniverse() {
+    public ElectricParallelUniverse() {
     }
 
     @Override
@@ -85,48 +79,25 @@ public class RoboParallelUniverse implements ParallelUniverseInterface {
         }
     }
 
-    private static Map<Pair<AndroidManifest, SdkConfig>, ResourceLoader> resourceLoadersByManifestAndConfig = new HashMap<Pair<AndroidManifest, SdkConfig>, ResourceLoader>();
-
-    public PackageResourceLoader createResourceLoader(ResourcePath resourcePath) {
-        return new PackageResourceLoader(resourcePath);
-    }
-
-    protected ResourceLoader createAppResourceLoader(ResourceLoader systemResourceLoader, AndroidManifest appManifest) {
-        List<PackageResourceLoader> appAndLibraryResourceLoaders = new ArrayList<PackageResourceLoader>();
-        for (ResourcePath resourcePath : appManifest.getIncludedResourcePaths()) {
-            appAndLibraryResourceLoaders.add(createResourceLoader(resourcePath));
-        }
-        OverlayResourceLoader overlayResourceLoader = new OverlayResourceLoader(appManifest.getPackageName(), appAndLibraryResourceLoaders);
-
-        Map<String, ResourceLoader> resourceLoaders = new HashMap<String, ResourceLoader>();
-        resourceLoaders.put("android", systemResourceLoader);
-        resourceLoaders.put(appManifest.getPackageName(), overlayResourceLoader);
-        return new RoutingResourceLoader(resourceLoaders);
-    }
-
-    public final ResourceLoader getAppResourceLoader(SdkConfig sdkConfig, ResourceLoader systemResourceLoader, final AndroidManifest appManifest) {
-        Pair<AndroidManifest, SdkConfig> androidManifestSdkConfigPair = new Pair<AndroidManifest, SdkConfig>(appManifest, sdkConfig);
-        ResourceLoader resourceLoader = resourceLoadersByManifestAndConfig.get(androidManifestSdkConfigPair);
-        if (resourceLoader == null) {
-            resourceLoader = createAppResourceLoader(systemResourceLoader, appManifest);
-            resourceLoadersByManifestAndConfig.put(androidManifestSdkConfigPair, resourceLoader);
-        }
-        return resourceLoader;
-    }
-
     @Override
-    public void setUpApplicationState(Method method, TestLifecycle testLifecycle, ResourceLoader systemResourceLoader, AndroidManifest appManifest, Config config) {
+    public void setUpApplicationState(Method method, TestLifecycle testLifecycle, AndroidManifest appManifest,
+                                      Config config, ResourceProvider compileTimeResourceProvider,
+                                      ResourceProvider appResourceProvider,
+                                      ResourceProvider systemResourceProvider) {
+        ReflectionHelpers.setStaticField(RuntimeEnvironment.class, "apiLevel", sdkConfig.getApiLevel());
+
         RuntimeEnvironment.application = null;
         RuntimeEnvironment.setMasterScheduler(new Scheduler());
         RuntimeEnvironment.setMainThread(Thread.currentThread());
-        ResourceLoader appResourceLoader = getAppResourceLoader(sdkConfig, systemResourceLoader, appManifest);
 
         DefaultPackageManager packageManager = new DefaultPackageManager();
-        initializeAppManifest(appManifest, appResourceLoader, packageManager);
         RuntimeEnvironment.setRobolectricPackageManager(packageManager);
 
-        RuntimeEnvironment.setAppResourceLoader(appResourceLoader);
-        RuntimeEnvironment.setSystemResourceLoader(systemResourceLoader);
+        RuntimeEnvironment.setCompileTimeResourceProvider(compileTimeResourceProvider);
+        RuntimeEnvironment.setAppResourceProvider(appResourceProvider);
+        RuntimeEnvironment.setSystemResourceProvider(systemResourceProvider);
+
+        initializeAppManifest(appManifest, appResourceProvider, packageManager);
 
         if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
             Security.insertProviderAt(new BouncyCastleProvider(), 1);
@@ -142,7 +113,6 @@ public class RoboParallelUniverse implements ParallelUniverseInterface {
         shadowsAdapter.overrideQualifiers(configuration, qualifiers);
         systemResources.updateConfiguration(configuration, systemResources.getDisplayMetrics());
         RuntimeEnvironment.setQualifiers(qualifiers);
-        RuntimeEnvironment.setApiLevel(sdkConfig.getApiLevel());
 
         Class<?> contextImplClass = ReflectionHelpers.loadClass(getClass().getClassLoader(), shadowsAdapter.getShadowContextImplClassName());
 
@@ -175,7 +145,7 @@ public class RoboParallelUniverse implements ParallelUniverseInterface {
 
             Class<?> compatibilityInfoClass = ReflectionHelpers.loadClass(getClass().getClassLoader(), "android.content.res.CompatibilityInfo");
 
-            Object loadedApk = ReflectionHelpers.callInstanceMethod(activityThread, "getPackageInfo",
+            LoadedApk loadedApk = ReflectionHelpers.callInstanceMethod(activityThread, "getPackageInfo",
                     ReflectionHelpers.ClassParameter.from(ApplicationInfo.class, applicationInfo),
                     ReflectionHelpers.ClassParameter.from(compatibilityInfoClass, null),
                     ReflectionHelpers.ClassParameter.from(int.class, Context.CONTEXT_INCLUDE_CODE));
@@ -200,7 +170,7 @@ public class RoboParallelUniverse implements ParallelUniverseInterface {
         }
     }
 
-    private void initializeAppManifest(AndroidManifest appManifest, ResourceLoader appResourceLoader, DefaultPackageManager packageManager) {
+    private void initializeAppManifest(AndroidManifest appManifest, ResourceProvider appResourceLoader, DefaultPackageManager packageManager) {
         appManifest.initMetaData(appResourceLoader);
         ResourceIndex resourceIndex = appResourceLoader.getResourceIndex();
 
@@ -251,5 +221,6 @@ public class RoboParallelUniverse implements ParallelUniverseInterface {
     @Override
     public void setSdkConfig(SdkConfig sdkConfig) {
         this.sdkConfig = sdkConfig;
+        ReflectionHelpers.setStaticField(RuntimeEnvironment.class, "apiLevel", sdkConfig.getApiLevel());
     }
 }

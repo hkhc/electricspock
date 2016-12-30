@@ -20,6 +20,7 @@ package hkhc.electricspock.internal;
 import android.app.Application;
 import android.os.Build;
 
+import org.jetbrains.annotations.NotNull;
 import org.robolectric.DefaultTestLifecycle;
 import org.robolectric.TestLifecycle;
 import org.robolectric.annotation.Config;
@@ -27,11 +28,18 @@ import org.robolectric.internal.ParallelUniverseInterface;
 import org.robolectric.internal.SdkConfig;
 import org.robolectric.internal.SdkEnvironment;
 import org.robolectric.manifest.AndroidManifest;
-import org.robolectric.res.ResourceLoader;
+import org.robolectric.res.PackageResourceIndex;
+import org.robolectric.res.ResourceExtractor;
+import org.robolectric.res.ResourceMerger;
+import org.robolectric.res.ResourceTable;
+import org.robolectric.res.RoutingResourceProvider;
 import org.robolectric.util.ReflectionHelpers;
 import org.spockframework.runtime.extension.AbstractMethodInterceptor;
 import org.spockframework.runtime.extension.IMethodInvocation;
 import org.spockframework.runtime.model.SpecInfo;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import hkhc.electricspock.ElectricSputnik;
 
@@ -47,6 +55,8 @@ public class ElectricSpockInterceptor extends AbstractMethodInterceptor {
     private AndroidManifest appManifest;
     private TestLifecycle<Application> testLifecycle;
     private DependencyResolverFactory dependencyResolverFactory;
+    private static final Map<AndroidManifest, ResourceTable> appResourceTableCache = new HashMap<>();
+    private static ResourceTable compiletimeSdkResourceTable;
 
     public ElectricSpockInterceptor(SpecInfo spec, SdkEnvironment sdk, Config config, AndroidManifest appManifest,
                                     DependencyResolverFactory dependencyResolverFactory) {
@@ -76,7 +86,7 @@ public class ElectricSpockInterceptor extends AbstractMethodInterceptor {
         try {
             @SuppressWarnings("unchecked")
             Class<ParallelUniverseInterface> aClass = (Class<ParallelUniverseInterface>)
-                    sdkEnvironment.getRobolectricClassLoader().loadClass(RoboParallelUniverse.class.getName());
+                    sdkEnvironment.getRobolectricClassLoader().loadClass(ElectricParallelUniverse.class.getName());
 
             return aClass.newInstance();
         } catch (ClassNotFoundException e) {
@@ -88,6 +98,9 @@ public class ElectricSpockInterceptor extends AbstractMethodInterceptor {
         }
     }
 
+    /*
+    Migrate from RobolectricTestRunner.methodBlock
+     */
     @Override
     public void interceptSpecExecution(IMethodInvocation invocation) throws Throwable {
 
@@ -108,10 +121,19 @@ public class ElectricSpockInterceptor extends AbstractMethodInterceptor {
             ReflectionHelpers.setStaticField(sdkEnvironment.bootstrappedClass(Build.VERSION.class),
                     "RELEASE", sdkConfig.getAndroidVersion());
 
-            ResourceLoader systemResourceLoader =
-                    sdkEnvironment.getSystemResourceLoader(dependencyResolverFactory.getJarResolver());
-            parallelUniverseInterface.setUpApplicationState(null,
-                    testLifecycle, systemResourceLoader, appManifest, config);
+            ResourceTable systemResourceTable = sdkEnvironment.getSystemResourceTable(dependencyResolverFactory.getJarResolver());
+            ResourceTable appResourceTable = getAppResourceTable(appManifest);
+
+            parallelUniverseInterface.setUpApplicationState(null, testLifecycle, appManifest, config,
+                    new RoutingResourceProvider(getCompiletimeSdkResourceTable(), appResourceTable),
+                    new RoutingResourceProvider(systemResourceTable, appResourceTable),
+                    new RoutingResourceProvider(systemResourceTable));
+
+
+//            ResourceLoader systemResourceLoader =
+//                    sdkEnvironment.getSystemResourceLoader(dependencyResolverFactory.getJarResolver());
+//            parallelUniverseInterface.setUpApplicationState(null,
+//                    testLifecycle, systemResourceLoader, appManifest, config);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e);
@@ -130,5 +152,30 @@ public class ElectricSpockInterceptor extends AbstractMethodInterceptor {
         }
 
     }
+
+    private final ResourceTable getAppResourceTable(final AndroidManifest appManifest) {
+        ResourceTable resourceTable = appResourceTableCache.get(appManifest);
+        if (resourceTable == null) {
+            resourceTable = ResourceMerger.buildResourceTable(appManifest);
+
+            appResourceTableCache.put(appManifest, resourceTable);
+        }
+        return resourceTable;
+    }
+
+    /**
+     * Returns the ResourceProvider for the compile time SDK.
+     */
+    @NotNull
+    private static ResourceTable getCompiletimeSdkResourceTable() {
+        if (compiletimeSdkResourceTable == null) {
+            String androidPackage = "android";
+            PackageResourceIndex resourceIndex = new PackageResourceIndex(androidPackage);
+            ResourceExtractor.populate(resourceIndex, android.R.class);
+            compiletimeSdkResourceTable = new ResourceTable(resourceIndex);
+        }
+        return compiletimeSdkResourceTable;
+    }
+
 
 }

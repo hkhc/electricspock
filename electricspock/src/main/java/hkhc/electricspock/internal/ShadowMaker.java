@@ -17,7 +17,9 @@
 
 package hkhc.electricspock.internal;
 
+import org.jetbrains.annotations.NotNull;
 import org.robolectric.annotation.Config;
+import org.robolectric.internal.SdkConfig;
 import org.robolectric.internal.SdkEnvironment;
 import org.robolectric.internal.bytecode.ClassHandler;
 import org.robolectric.internal.bytecode.InvokeDynamic;
@@ -31,6 +33,7 @@ import java.util.Set;
 
 /**
  * Created by herman on 28/12/2016.
+ * Migrate shadows configuration logic from RobolectricTestRunner
  */
 
 public class ShadowMaker {
@@ -51,24 +54,63 @@ public class ShadowMaker {
             sdkEnvironment.getShadowInvalidator().invalidateClasses(invalidatedClasses);
         }
 
-        ClassHandler classHandler = getClassHandler(sdkEnvironment, shadowMap);
+        ClassHandler classHandler = createClassHandler(shadowMap, sdkEnvironment.getSdkConfig());
         injectEnvironment(sdkEnvironment.getRobolectricClassLoader(), classHandler, sdkEnvironment.getShadowInvalidator());
     }
+
+
+//    public void configureShadows(SdkEnvironment sdkEnvironment, Config config) {
+//        ShadowMap shadowMap = createShadowMap();
+//
+//        if (config != null) {
+//            Class<?>[] shadows = config.shadows();
+//            if (shadows.length > 0) {
+//                shadowMap = shadowMap.newBuilder().addShadowClasses(shadows).build();
+//            }
+//        }
+//
+//        if (InvokeDynamic.ENABLED) {
+//            ShadowMap oldShadowMap = sdkEnvironment.replaceShadowMap(shadowMap);
+//            Set<String> invalidatedClasses = shadowMap.getInvalidatedClasses(oldShadowMap);
+//            sdkEnvironment.getShadowInvalidator().invalidateClasses(invalidatedClasses);
+//        }
+//
+//        ClassHandler classHandler = createClassHandler(sdkEnvironment, shadowMap);
+//        injectEnvironment(sdkEnvironment.getRobolectricClassLoader(), classHandler, sdkEnvironment.getShadowInvalidator());
+//    }
 
     private ShadowMap createShadowMap() {
         return ShadowMap.EMPTY;
     }
 
-    private ClassHandler getClassHandler(SdkEnvironment sdkEnvironment, ShadowMap shadowMap) {
-        ClassHandler classHandler;
-        synchronized (sdkEnvironment) {
-            classHandler = sdkEnvironment.classHandlersByShadowMap.get(shadowMap);
-            if (classHandler == null) {
-                classHandler = new ShadowWrangler(shadowMap);
-            }
-        }
-        return classHandler;
+//    private ClassHandler getClassHandler(SdkEnvironment sdkEnvironment, ShadowMap shadowMap) {
+//        ClassHandler classHandler;
+//        synchronized (sdkEnvironment) {
+//            classHandler = sdkEnvironment.classHandlersByShadowMap.get(shadowMap);
+//            if (classHandler == null) {
+//                classHandler = new ShadowWrangler(shadowMap);
+//            }
+//        }
+//        return classHandler;
+//    }
+
+    /**
+     * Create a {@link ClassHandler} appropriate for the given arguments.
+     *
+     * Robolectric may chose to cache the returned instance, keyed by <tt>shadowMap</tt> and <tt>sdkConfig</tt>.
+     *
+     * Custom TestRunner subclasses may wish to override this method to provide alternate configuration.
+     *
+     * @param shadowMap the {@link ShadowMap} in effect for this test
+     * @param sdkConfig the {@link SdkConfig} in effect for this test
+     * @return an appropriate {@link ClassHandler}. This implementation returns a {@link ShadowWrangler}.
+     * @since robolectric-2.3
+     */
+    @NotNull
+    protected ClassHandler createClassHandler(ShadowMap shadowMap, SdkConfig sdkConfig) {
+        return new ShadowWrangler(shadowMap, sdkConfig.getApiLevel());
     }
+
 
     private void injectEnvironment(ClassLoader robolectricClassLoader,
                                          ClassHandler classHandler, ShadowInvalidator invalidator) {
