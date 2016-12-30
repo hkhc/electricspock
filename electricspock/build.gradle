@@ -17,7 +17,7 @@
 
 apply plugin: 'com.android.library'
 apply plugin: 'groovyx.android'
-apply plugin: 'me.tatarka.retrolambda'
+apply plugin: 'nebula.provided-base'
 
 android {
     compileSdkVersion 25
@@ -47,12 +47,6 @@ dependencies {
     compile 'org.codehaus.groovy:groovy-all:2.4.7'
     compile "org.spockframework:spock-core:1.1-groovy-2.4-rc-3"
 
-    // a crazy dependency of Robolectric (3.1.2), see https://github.com/robolectric/robolectric/issues/1932
-    testCompile 'org.khronos:opengl-api:gl1.1-android-2.1_r1'
-
-    // TODO migrate the AndroidSDK class instead of hardcoding the sdk artifact
-//    testCompile "org.robolectric:android-all:7.1.0_r7-robolectric-0"
-
     compile 'org.jetbrains:annotations-java5:15.0'
-    compile 'org.robolectric:android-all:7.1.0_r7-robolectric-0'
+    provided 'org.robolectric:android-all:7.1.0_r7-robolectric-0'
 }
