@@ -40,7 +40,7 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile "org.robolectric:robolectric:3.2", {
+    compile "org.robolectric:robolectric:3.2.2", {
         exclude group:'junit', module: 'junit'
     }
     compile 'junit:junit:4.12'
