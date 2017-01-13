@@ -38,7 +38,7 @@ class BasicSpec extends ElectricSpecification {
         when:
             a=a*2
         then:
-            a==21
+            a==20
 
     }
 
