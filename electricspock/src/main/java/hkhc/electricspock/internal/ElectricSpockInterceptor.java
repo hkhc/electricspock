@@ -28,11 +28,11 @@ import org.robolectric.internal.ParallelUniverseInterface;
 import org.robolectric.internal.SdkConfig;
 import org.robolectric.internal.SdkEnvironment;
 import org.robolectric.manifest.AndroidManifest;
-import org.robolectric.res.PackageResourceIndex;
-import org.robolectric.res.ResourceExtractor;
+import org.robolectric.res.PackageResourceTable;
 import org.robolectric.res.ResourceMerger;
-import org.robolectric.res.ResourceTable;
-import org.robolectric.res.RoutingResourceProvider;
+import org.robolectric.res.ResourcePath;
+import org.robolectric.res.ResourceTableFactory;
+import org.robolectric.res.RoutingResourceTable;
 import org.robolectric.util.ReflectionHelpers;
 import org.spockframework.runtime.extension.AbstractMethodInterceptor;
 import org.spockframework.runtime.extension.IMethodInvocation;
@@ -55,8 +55,8 @@ public class ElectricSpockInterceptor extends AbstractMethodInterceptor {
     private AndroidManifest appManifest;
     private TestLifecycle<Application> testLifecycle;
     private DependencyResolverFactory dependencyResolverFactory;
-    private static final Map<AndroidManifest, ResourceTable> appResourceTableCache = new HashMap<>();
-    private static ResourceTable compiletimeSdkResourceTable;
+    private static final Map<AndroidManifest, PackageResourceTable> appResourceTableCache = new HashMap<>();
+    private static PackageResourceTable compiletimeSdkResourceTable;
 
     public ElectricSpockInterceptor(SpecInfo spec, SdkEnvironment sdk, Config config, AndroidManifest appManifest,
                                     DependencyResolverFactory dependencyResolverFactory) {
@@ -121,13 +121,13 @@ public class ElectricSpockInterceptor extends AbstractMethodInterceptor {
             ReflectionHelpers.setStaticField(sdkEnvironment.bootstrappedClass(Build.VERSION.class),
                     "RELEASE", sdkConfig.getAndroidVersion());
 
-            ResourceTable systemResourceTable = sdkEnvironment.getSystemResourceTable(dependencyResolverFactory.getJarResolver());
-            ResourceTable appResourceTable = getAppResourceTable(appManifest);
+            PackageResourceTable systemResourceTable = sdkEnvironment.getSystemResourceTable(dependencyResolverFactory.getJarResolver());
+            PackageResourceTable appResourceTable = getAppResourceTable(appManifest);
 
             parallelUniverseInterface.setUpApplicationState(null, testLifecycle, appManifest, config,
-                    new RoutingResourceProvider(getCompiletimeSdkResourceTable(), appResourceTable),
-                    new RoutingResourceProvider(systemResourceTable, appResourceTable),
-                    new RoutingResourceProvider(systemResourceTable));
+                    new RoutingResourceTable(getCompiletimeSdkResourceTable(), appResourceTable),
+                    new RoutingResourceTable(systemResourceTable, appResourceTable),
+                    new RoutingResourceTable(systemResourceTable));
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -148,8 +148,8 @@ public class ElectricSpockInterceptor extends AbstractMethodInterceptor {
 
     }
 
-    private final ResourceTable getAppResourceTable(final AndroidManifest appManifest) {
-        ResourceTable resourceTable = appResourceTableCache.get(appManifest);
+    private final PackageResourceTable getAppResourceTable(final AndroidManifest appManifest) {
+        PackageResourceTable resourceTable = appResourceTableCache.get(appManifest);
         if (resourceTable == null) {
             resourceTable = ResourceMerger.buildResourceTable(appManifest);
 
@@ -162,12 +162,10 @@ public class ElectricSpockInterceptor extends AbstractMethodInterceptor {
      * Returns the ResourceProvider for the compile time SDK.
      */
     @NotNull
-    private static ResourceTable getCompiletimeSdkResourceTable() {
+    private static PackageResourceTable getCompiletimeSdkResourceTable() {
         if (compiletimeSdkResourceTable == null) {
-            String androidPackage = "android";
-            PackageResourceIndex resourceIndex = new PackageResourceIndex(androidPackage);
-            ResourceExtractor.populate(resourceIndex, android.R.class);
-            compiletimeSdkResourceTable = new ResourceTable(resourceIndex);
+            compiletimeSdkResourceTable = ResourceTableFactory.newResourceTable("android",
+                    new ResourcePath(android.R.class, null, null));
         }
         return compiletimeSdkResourceTable;
     }

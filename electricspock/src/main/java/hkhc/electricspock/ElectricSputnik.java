@@ -35,9 +35,11 @@ import org.robolectric.manifest.AndroidManifest;
 import org.spockframework.runtime.Sputnik;
 import org.spockframework.runtime.model.SpecInfo;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.SecureRandom;
+import java.util.Properties;
 
 import hkhc.electricspock.internal.AndroidManifestFactory;
 import hkhc.electricspock.internal.ConfigFactory;
@@ -131,26 +133,29 @@ public class ElectricSputnik extends Runner implements Filterable, Sortable {
             }
         }
 
+    }
+
+    private String getCurrentRobolectricVersion() {
+
+        try {
+            Properties prop = new Properties();
+            prop.load(getClass().getClassLoader().getResourceAsStream("robolectric-version.properties"));
+            return prop.getProperty("robolectric.version");
+        }
+        catch (IOException e) {
+            return "Unknown";
+        }
+
 
     }
 
     private void checkRobolectricVersion() {
 
-        if (!isUsingRobolectric_3_2()) {
+        String ver = getCurrentRobolectricVersion();
+        if (!(ver.equals("3.2") ||
+                ver.indexOf("3.2.")==0 ||
+                ver.indexOf("3.2-")==0))
             throw new RuntimeException("This version of ElectricSpock supports Robolectric 3.2 only");
-        }
-
-    }
-
-    private boolean isUsingRobolectric_3_2() {
-
-        try {
-            Class.forName("org.robolectric.ConfigMerger");
-            return true;
-        } catch (ClassNotFoundException e) {
-            return false;
-        }
-
     }
 
     public InstrumentationConfiguration createClassLoaderConfig() {

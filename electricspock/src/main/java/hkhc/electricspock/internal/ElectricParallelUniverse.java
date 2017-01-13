@@ -46,8 +46,7 @@ import org.robolectric.manifest.ActivityData;
 import org.robolectric.manifest.AndroidManifest;
 import org.robolectric.res.Qualifiers;
 import org.robolectric.res.ResName;
-import org.robolectric.res.ResourceIndex;
-import org.robolectric.res.ResourceProvider;
+import org.robolectric.res.ResourceTable;
 import org.robolectric.res.builder.DefaultPackageManager;
 import org.robolectric.res.builder.RobolectricPackageManager;
 import org.robolectric.shadows.ShadowLooper;
@@ -88,9 +87,9 @@ public class ElectricParallelUniverse implements ParallelUniverseInterface {
 
     @Override
     public void setUpApplicationState(Method method, TestLifecycle testLifecycle, AndroidManifest appManifest,
-                                      Config config, ResourceProvider compileTimeResourceProvider,
-                                      ResourceProvider appResourceProvider,
-                                      ResourceProvider systemResourceProvider) {
+                                      Config config, ResourceTable compileTimeResourceProvider,
+                                      ResourceTable appResourceTable,
+                                      ResourceTable systemResourceProvider) {
         ReflectionHelpers.setStaticField(RuntimeEnvironment.class, "apiLevel", sdkConfig.getApiLevel());
 
         RuntimeEnvironment.application = null;
@@ -100,11 +99,11 @@ public class ElectricParallelUniverse implements ParallelUniverseInterface {
         DefaultPackageManager packageManager = new DefaultPackageManager();
         RuntimeEnvironment.setRobolectricPackageManager(packageManager);
 
-        RuntimeEnvironment.setCompileTimeResourceProvider(compileTimeResourceProvider);
-        RuntimeEnvironment.setAppResourceProvider(appResourceProvider);
-        RuntimeEnvironment.setSystemResourceProvider(systemResourceProvider);
+        RuntimeEnvironment.setCompileTimeResourceTable(compileTimeResourceProvider);
+        RuntimeEnvironment.setAppResourceTable(appResourceTable);
+        RuntimeEnvironment.setSystemResourceTable(systemResourceProvider);
 
-        initializeAppManifest(appManifest, appResourceProvider, packageManager);
+        initializeAppManifest(appManifest, appResourceTable, packageManager);
 
         if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
             Security.insertProviderAt(new BouncyCastleProvider(), 1);
@@ -177,17 +176,16 @@ public class ElectricParallelUniverse implements ParallelUniverseInterface {
         }
     }
 
-    private void initializeAppManifest(AndroidManifest appManifest, ResourceProvider appResourceLoader, DefaultPackageManager packageManager) {
-        appManifest.initMetaData(appResourceLoader);
-        ResourceIndex resourceIndex = appResourceLoader.getResourceIndex();
+    private void initializeAppManifest(AndroidManifest appManifest, ResourceTable appResourceTable, DefaultPackageManager packageManager) {
+        appManifest.initMetaData(appResourceTable);
 
         int labelRes = 0;
-        if (appManifest.getLabelRef() != null && resourceIndex != null) {
-            Integer id = ResName.getResourceId(resourceIndex, appManifest.getLabelRef(), appManifest.getPackageName());
+        if (appManifest.getLabelRef() != null) {
+            String fullyQualifiedName = ResName.qualifyResName(appManifest.getLabelRef(), appManifest.getPackageName());
+            Integer id = fullyQualifiedName == null ? null : appResourceTable.getResourceId(new ResName(fullyQualifiedName));
             labelRes = id != null ? id : 0;
         }
-        packageManager.addManifest(appManifest, labelRes);
-    }
+        packageManager.addManifest(appManifest, labelRes);    }
 
     private void addManifestActivitiesToPackageManager(AndroidManifest appManifest, Application application) {
         if (appManifest != null) {
