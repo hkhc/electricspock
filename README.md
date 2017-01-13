@@ -34,7 +34,7 @@ Add the dependency
 
 ```groovy
 	dependencies {
-		compile 'com.github.hkhc:electricspock:0.2'
+		testCompile 'com.github.hkhc:electricspock:0.2'
 	}
 ```
 
