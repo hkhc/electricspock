@@ -13,7 +13,7 @@ The Android test framework [Robolectric](https://github.com/robolectric/robolect
 
 It is heavily based on RoboSpock project. It borrow a lot of code from there, and make some tweak of my own. This project is never possible without the excellent foundation.
 
-Current version of the library is tested with Robolectric 3.1.4. 
+Current version (0.2) of the library is tested with Robolectric 3.2.2. 
 
 # Installation (Gradle)
 
