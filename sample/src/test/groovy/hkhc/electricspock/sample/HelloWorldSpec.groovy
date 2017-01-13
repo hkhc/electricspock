@@ -21,6 +21,7 @@ import android.util.Log
 import hkhc.electricspock.ElectricSpecification
 import org.robolectric.Robolectric
 import org.robolectric.annotation.Config
+import spock.lang.Ignore
 import spock.lang.Issue
 import spock.lang.Narrative
 import spock.lang.Title
@@ -66,6 +67,7 @@ class HelloWorldSpec extends ElectricSpecification {
     }
 
     @Unroll
+    @Ignore("Just to illustrate a failed test")
     @Issue("http://www.google.com")
     def "Test multiplication of #a"() {
 
