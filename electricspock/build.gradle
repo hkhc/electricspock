@@ -18,6 +18,9 @@
 apply plugin: 'java'
 apply plugin: 'groovy'
 apply plugin: 'nebula.provided-base'
+apply plugin: 'maven'
+
+group = 'com.github.hkhc'
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
