@@ -4,6 +4,8 @@
 
 ## What's new
 
+Version 0.3.1 fix an issue to build with jitpack.
+
 Version 0.3 is built as JAR rather than AAR to make gradle detect `ElectricSpecification` as JUnit class properly.
 
 Version 0.2 is updated to work with Robolectric 3.2.
@@ -16,7 +18,7 @@ The Android test framework [Robolectric](https://github.com/robolectric/robolect
 
 It is heavily based on RoboSpock project. It borrow a lot of code from there, and make some tweak of my own. This project is never possible without the excellent foundation.
 
-Current version (0.3) of the library is tested with Robolectric 3.2.2. 
+Current version (0.3.1) of the library is tested with Robolectric 3.2.2. 
 
 # Installation (Gradle)
 
@@ -37,7 +39,7 @@ Add the dependency
 
 ```groovy
 	dependencies {
-		testCompile 'com.github.hkhc:electricspock:0.3'
+		testCompile 'com.github.hkhc:electricspock:0.3.1'
 	}
 ```
 
