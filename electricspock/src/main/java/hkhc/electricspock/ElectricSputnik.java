@@ -49,16 +49,12 @@ import hkhc.electricspock.internal.ElectricSpockInterceptor;
 
 /**
  * Created by herman on 27/12/2016.
+ * Test Runner
  */
 
 public class ElectricSputnik extends Runner implements Filterable, Sortable {
 
-    private Config config;
-    private AndroidManifest appManifest;
-    private InstrumentingClassLoaderFactory instrumentingClassLoaderFactory;
-    private SdkEnvironment sdkEnvironment;
     private Object sputnik;
-    private DependencyResolverFactory dependencyResolverFactory = new DependencyResolverFactory();
 
     static {
         new SecureRandom(); // this starts up the Poller SunPKCS11-Darwin thread early, outside of any Robolectric classloader
@@ -66,17 +62,19 @@ public class ElectricSputnik extends Runner implements Filterable, Sortable {
 
     public ElectricSputnik(Class<?> testClass) {
 
+        DependencyResolverFactory dependencyResolverFactory = new DependencyResolverFactory();
+
         checkRobolectricVersion();
 
         AndroidManifestFactory androidManifestFactory = new AndroidManifestFactory();
 
-        config = (new ConfigFactory()).getConfig(testClass);
-        appManifest = androidManifestFactory.getAppManifest(config);
-        instrumentingClassLoaderFactory =
+        Config config = (new ConfigFactory()).getConfig(testClass);
+        AndroidManifest appManifest = androidManifestFactory.getAppManifest(config);
+        InstrumentingClassLoaderFactory instrumentingClassLoaderFactory =
                 new InstrumentingClassLoaderFactory(
                         createClassLoaderConfig(),
                         dependencyResolverFactory.getJarResolver());
-        sdkEnvironment =
+        SdkEnvironment sdkEnvironment =
                 instrumentingClassLoaderFactory.getSdkEnvironment(
                         new SdkConfig(androidManifestFactory.pickSdkVersion(config, appManifest)));
 
@@ -119,15 +117,8 @@ public class ElectricSputnik extends Runner implements Filterable, Sortable {
                             )
                             .newInstance(spec, sdkEnvironment, config, appManifest, dependencyResolverFactory);
 
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                } catch (InvocationTargetException e) {
-                    throw new RuntimeException(e);
-                }
-                catch (NoSuchMethodException e) {
-                    throw new RuntimeException(e);
-                }
-                catch (InstantiationException e) {
+                } catch (IllegalAccessException | InstantiationException |
+                        NoSuchMethodException | InvocationTargetException e) {
                     throw new RuntimeException(e);
                 }
             }
@@ -158,7 +149,7 @@ public class ElectricSputnik extends Runner implements Filterable, Sortable {
             throw new RuntimeException("This version of ElectricSpock supports Robolectric 3.2 only");
     }
 
-    public InstrumentationConfiguration createClassLoaderConfig() {
+    private InstrumentationConfiguration createClassLoaderConfig() {
         return InstrumentationConfiguration.newBuilder()
                 .doNotAcquireClass(DependencyResolver.class.getName())
                 .doNotAcquireClass(DependencyResolverFactory.class.getName())

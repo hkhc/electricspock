@@ -21,6 +21,7 @@ import org.junit.runner.RunWith
 import spock.lang.Specification;
 /**
  * Created by herman on 28/12/2016.
+ * Test Runner declared here
  */
 @RunWith(ElectricSputnik)
 class ElectricSpecification extends Specification {

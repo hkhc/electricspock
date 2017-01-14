@@ -19,6 +19,7 @@ package hkhc.electricspock.internal;
 
 /**
  * Created by herman on 30/12/2016.
+ * Hook
  */
 
 import android.app.Application;
@@ -34,7 +35,6 @@ import android.os.Looper;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.robolectric.Robolectric;
-import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.ShadowsAdapter;
 import org.robolectric.TestLifecycle;
@@ -58,8 +58,7 @@ import java.lang.reflect.Method;
 import java.security.Security;
 import java.util.Map;
 
-public class ElectricParallelUniverse implements ParallelUniverseInterface {
-    private final RobolectricTestRunner robolectricTestRunner;
+class ElectricParallelUniverse implements ParallelUniverseInterface {
     private final ShadowsAdapter shadowsAdapter = Robolectric.getShadowsAdapter();
 
     private boolean loggingInitialized = false;
@@ -67,11 +66,6 @@ public class ElectricParallelUniverse implements ParallelUniverseInterface {
 
     // Extra constructor for ElectricSpock
     public ElectricParallelUniverse() {
-        this(null);
-    }
-
-    public ElectricParallelUniverse(RobolectricTestRunner robolectricTestRunner) {
-        this.robolectricTestRunner = robolectricTestRunner;
     }
 
     @Override
@@ -86,6 +80,7 @@ public class ElectricParallelUniverse implements ParallelUniverseInterface {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public void setUpApplicationState(Method method, TestLifecycle testLifecycle, AndroidManifest appManifest,
                                       Config config, ResourceTable compileTimeResourceProvider,
                                       ResourceTable appResourceTable,
