@@ -49,6 +49,7 @@ dependencies {
     testCompile 'org.spockframework:spock-core:1.1-groovy-2.4-rc-3'
     testCompile 'org.robolectric:robolectric:3.2.2'
     testCompile project(':electricspock-core')
+    testCompile project(':electricspock')
     testCompile( 'com.athaydes:spock-reports:1.2.13' ) {
         transitive = false // this avoids affecting your version of Groovy/Spock
     }
