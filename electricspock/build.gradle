@@ -20,9 +20,10 @@ apply plugin: 'groovy'
 apply plugin: 'maven'
 
 group = 'com.github.hkhc'
+def coreProject = 'electricspock-core'
 
 // Include the classes from core electricspock project
-def pwd = project.rootDir.toString()+"/electricspock-core"
+def pwd = project.rootDir.toString()+"/"+coreProject
 jar {
     from {
         (configurations.runtime).findAll {
@@ -46,7 +47,7 @@ dependencies {
     compile 'org.jetbrains:annotations-java5:15.0'
     compile 'junit:junit:4.12'
 
-    compile project(':electricspock-core')
+    compile project(':'+coreProject)
 
 }
 
