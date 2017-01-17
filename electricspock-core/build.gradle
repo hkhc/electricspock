@@ -1,4 +1,3 @@
-include ':electricspock-core'
 /*
  * Copyright 2016 Herman Cheung
  *
@@ -16,4 +15,24 @@ include ':electricspock-core'
  *
  */
 
-include 'electricspock', 'electricspock-core', 'sample'
+apply plugin: 'java'
+apply plugin: 'groovy'
+apply plugin: 'nebula.provided-base'
+apply plugin: 'maven'
+
+group = 'com.github.hkhc'
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+
+    compile "org.robolectric:robolectric:3.2.2", {
+        exclude group:'junit', module: 'junit'
+    }
+
+    compile 'org.codehaus.groovy:groovy-all:2.4.7'
+    compile "org.spockframework:spock-core:1.1-groovy-2.4-rc-3"
+
+    compile 'org.jetbrains:annotations-java5:15.0'
+    provided 'org.robolectric:android-all:7.1.0_r7-robolectric-0'
+    compile 'junit:junit:4.12'
+}

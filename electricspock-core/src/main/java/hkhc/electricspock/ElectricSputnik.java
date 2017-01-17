@@ -36,6 +36,7 @@ import org.spockframework.runtime.Sputnik;
 import org.spockframework.runtime.model.SpecInfo;
 
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.SecureRandom;
@@ -46,6 +47,7 @@ import hkhc.electricspock.internal.ConfigFactory;
 import hkhc.electricspock.internal.DependencyResolverFactory;
 import hkhc.electricspock.internal.ShadowMaker;
 import hkhc.electricspock.internal.ElectricSpockInterceptor;
+import spock.lang.Title;
 
 /**
  * Created by herman on 27/12/2016.
@@ -157,7 +159,34 @@ public class ElectricSputnik extends Runner implements Filterable, Sortable {
     }
 
     public Description getDescription() {
-        return ((Runner) sputnik).getDescription();
+
+        System.out.println("getDescription");
+
+        Description originalDesc = ((Runner) sputnik).getDescription();
+        System.out.println("getDescription "+originalDesc.getDisplayName());
+
+        Class<?> testClass = originalDesc.getTestClass();
+        String title = null;
+        Annotation[] annotations = null;
+        if (testClass!=null) {
+            annotations = testClass.getAnnotations();
+            for (Annotation a : annotations) {
+                if (a instanceof Title) {
+                    title = ((Title) a).value();
+                    break;
+                }
+            }
+        }
+
+
+        Description overridedDesc = Description.createSuiteDescription(
+                title==null ? testClass.getName() : title
+        );
+        for(Description d : originalDesc.getChildren()) {
+            overridedDesc.addChild(d);
+        }
+        return overridedDesc;
+
     }
 
     public void run(RunNotifier notifier) {

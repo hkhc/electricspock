@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Herman Cheung
+ * Copyright 2017 Herman Cheung
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,21 +17,38 @@
 
 apply plugin: 'java'
 apply plugin: 'groovy'
-apply plugin: 'nebula.provided-base'
 apply plugin: 'maven'
 
 group = 'com.github.hkhc'
 
+// Include the classes from core electricspock project
+def pwd = project.rootDir.toString()+"/electricspock-core"
+jar {
+    from {
+        (configurations.runtime).findAll {
+            it.toString().startsWith(pwd)
+        }
+        .collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+}
+
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile "org.robolectric:robolectric:3.2.2", {
-        exclude group:'junit', module: 'junit'
-    }
-    compile 'junit:junit:4.12'
 
     compile 'org.codehaus.groovy:groovy-all:2.4.7'
     compile "org.spockframework:spock-core:1.1-groovy-2.4-rc-3"
+    compile 'cglib:cglib-nodep:3.2.4'
+
+//    testCompile 'net.bytebuddy:byte-buddy:1.6.3'
 
     compile 'org.jetbrains:annotations-java5:15.0'
-    provided 'org.robolectric:android-all:7.1.0_r7-robolectric-0'
+    compile 'junit:junit:4.12'
+
+    compile project(':electricspock-core')
+
 }
+
+sourceCompatibility = "1.7"
+targetCompatibility = "1.7"

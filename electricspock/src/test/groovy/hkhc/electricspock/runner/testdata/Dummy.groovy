@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Herman Cheung
+ * Copyright 2017 Herman Cheung
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,9 @@
  *
  */
 
-package hkhc.electricspock
-
-import org.junit.runner.RunWith
-import spock.lang.Specification;
+package hkhc.electricspock.runner.testdata;
 /**
- * Created by herman on 28/12/2016.
- * Test Runner declared here
+ * Created by herman on 16/1/2017.
  */
-@RunWith(ElectricSputnik)
-class ElectricSpecification extends Specification {
+class Dummy {
 }

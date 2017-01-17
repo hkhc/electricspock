@@ -1,6 +1,5 @@
-include ':electricspock-core'
 /*
- * Copyright 2016 Herman Cheung
+ * Copyright 2017 Herman Cheung
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,4 +15,13 @@ include ':electricspock-core'
  *
  */
 
-include 'electricspock', 'electricspock-core', 'sample'
+package hkhc.electricspock.runner
+
+import org.junit.runner.RunWith
+
+/**
+ * Created by herman on 15/1/2017.
+ */
+@RunWith(InnerSpecRunner.class)
+class ElectricSuite {
+}

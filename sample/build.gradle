@@ -48,5 +48,10 @@ dependencies {
     testCompile 'org.codehaus.groovy:groovy-all:2.4.7'
     testCompile 'org.spockframework:spock-core:1.1-groovy-2.4-rc-3'
     testCompile 'org.robolectric:robolectric:3.2.2'
-    testCompile project(':electricspock')
+    testCompile project(':electricspock-core')
+    testCompile( 'com.athaydes:spock-reports:1.2.13' ) {
+        transitive = false // this avoids affecting your version of Groovy/Spock
+    }
+    testCompile 'org.slf4j:slf4j-api:1.7.13' // needed by spock-reports
+    testCompile 'org.slf4j:slf4j-simple:1.7.13' // needed by spock-reports
 }
