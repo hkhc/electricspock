@@ -24,9 +24,10 @@ def coreProject = 'electricspock-core'
 
 // Include the classes from core electricspock project
 def pwd = project.rootDir.toString()+"/"+coreProject
+println "pwd="+pwd
 jar {
     from {
-        (configurations.runtime).findAll {
+        (configurations.compileOnly).findAll {
             it.toString().startsWith(pwd)
         }
         .collect {
