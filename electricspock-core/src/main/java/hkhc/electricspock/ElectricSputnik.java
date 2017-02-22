@@ -160,10 +160,7 @@ public class ElectricSputnik extends Runner implements Filterable, Sortable {
 
     public Description getDescription() {
 
-        System.out.println("getDescription");
-
         Description originalDesc = ((Runner) sputnik).getDescription();
-        System.out.println("getDescription "+originalDesc.getDisplayName());
 
         Class<?> testClass = originalDesc.getTestClass();
         String title = null;
