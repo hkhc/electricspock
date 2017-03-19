@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Herman Cheung
+ * Copyright 2017 Herman Cheung
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,12 +20,7 @@ package hkhc.electricspock.sample
 import android.util.Log
 import hkhc.electricspock.ElectricSpecification
 import org.robolectric.Robolectric
-import org.robolectric.annotation.Config
-import spock.lang.Ignore
-import spock.lang.Issue
-import spock.lang.Narrative
-import spock.lang.Title
-import spock.lang.Unroll
+import spock.lang.*
 
 /**
  * Created by herman on 27/12/2016.
@@ -37,7 +32,7 @@ A for apple
 B for boy
 C for cat
 """)
-class HelloWorldSpec extends ElectricSpecification {
+class HelloWorldSpec2 extends ElectricSpecification {
 
     def "This is a test for Log"() {
         given: "This is a given block"

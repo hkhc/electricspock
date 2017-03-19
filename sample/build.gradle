@@ -50,9 +50,9 @@ dependencies {
     testCompile 'org.robolectric:robolectric:3.2.2'
     testCompile project(':electricspock-core')
     testCompile project(':electricspock')
-    testCompile( 'com.athaydes:spock-reports:1.2.13' ) {
-        transitive = false // this avoids affecting your version of Groovy/Spock
-    }
-    testCompile 'org.slf4j:slf4j-api:1.7.13' // needed by spock-reports
-    testCompile 'org.slf4j:slf4j-simple:1.7.13' // needed by spock-reports
+//    testCompile( 'com.athaydes:spock-reports:1.2.13' ) {
+//        transitive = false // this avoids affecting your version of Groovy/Spock
+//    }
+//    testCompile 'org.slf4j:slf4j-api:1.7.13' // needed by spock-reports
+//    testCompile 'org.slf4j:slf4j-simple:1.7.13' // needed by spock-reports
 }

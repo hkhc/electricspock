@@ -29,6 +29,7 @@ import org.robolectric.annotation.Config;
 import org.robolectric.internal.InstrumentingClassLoaderFactory;
 import org.robolectric.internal.SdkConfig;
 import org.robolectric.internal.SdkEnvironment;
+import org.robolectric.internal.ShadowProvider;
 import org.robolectric.internal.bytecode.InstrumentationConfiguration;
 import org.robolectric.internal.dependency.DependencyResolver;
 import org.robolectric.manifest.AndroidManifest;
@@ -155,6 +156,7 @@ public class ElectricSputnik extends Runner implements Filterable, Sortable {
         return InstrumentationConfiguration.newBuilder()
                 .doNotAcquireClass(DependencyResolver.class.getName())
                 .doNotAcquireClass(DependencyResolverFactory.class.getName())
+                .doNotAcquireClass(ShadowProvider.class.getName())
                 .build();
     }
 
