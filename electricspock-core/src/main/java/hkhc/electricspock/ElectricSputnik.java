@@ -17,6 +17,8 @@
 
 package hkhc.electricspock;
 
+import org.jetbrains.annotations.NotNull;
+import org.junit.Test;
 import org.junit.runner.Description;
 import org.junit.runner.Runner;
 import org.junit.runner.manipulation.Filter;
@@ -25,12 +27,14 @@ import org.junit.runner.manipulation.NoTestsRemainException;
 import org.junit.runner.manipulation.Sortable;
 import org.junit.runner.manipulation.Sorter;
 import org.junit.runner.notification.RunNotifier;
+import org.junit.runners.model.FrameworkMethod;
+import org.junit.runners.model.InitializationError;
+import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
-import org.robolectric.internal.InstrumentingClassLoaderFactory;
+import org.robolectric.internal.SandboxFactory;
 import org.robolectric.internal.SdkConfig;
 import org.robolectric.internal.SdkEnvironment;
-import org.robolectric.internal.ShadowProvider;
-import org.robolectric.internal.bytecode.InstrumentationConfiguration;
+import org.robolectric.internal.bytecode.SandboxConfig;
 import org.robolectric.internal.dependency.DependencyResolver;
 import org.robolectric.manifest.AndroidManifest;
 import org.spockframework.runtime.Sputnik;
@@ -41,21 +45,23 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import hkhc.electricspock.internal.AndroidManifestFactory;
 import hkhc.electricspock.internal.ConfigFactory;
-import hkhc.electricspock.internal.DependencyResolverFactory;
-import hkhc.electricspock.internal.ShadowMaker;
 import hkhc.electricspock.internal.ElectricSpockInterceptor;
 import spock.lang.Title;
+
+import static java.util.Arrays.asList;
 
 /**
  * Created by herman on 27/12/2016.
  * Test Runner
  */
 
-public class ElectricSputnik extends Runner implements Filterable, Sortable {
+public class ElectricSputnik extends RobolectricTestRunner {
 
     private Object sputnik;
 
@@ -63,27 +69,32 @@ public class ElectricSputnik extends Runner implements Filterable, Sortable {
         new SecureRandom(); // this starts up the Poller SunPKCS11-Darwin thread early, outside of any Robolectric classloader
     }
 
-    public ElectricSputnik(Class<?> testClass) {
+    public static class AAA {
+        @Test
+        public void testOne() {
 
-        DependencyResolverFactory dependencyResolverFactory = new DependencyResolverFactory();
+        }
+    }
+
+    public ElectricSputnik(Class<?> testClass)  throws InitializationError {
+
+        super(AAA.class);
 
         checkRobolectricVersion();
 
-        AndroidManifestFactory androidManifestFactory = new AndroidManifestFactory();
-
         Config config = (new ConfigFactory()).getConfig(testClass);
+
+        AndroidManifestFactory androidManifestFactory = new AndroidManifestFactory();
         AndroidManifest appManifest = androidManifestFactory.getAppManifest(config);
-        InstrumentingClassLoaderFactory instrumentingClassLoaderFactory =
-                new InstrumentingClassLoaderFactory(
-                        createClassLoaderConfig(),
-                        dependencyResolverFactory.getJarResolver());
-        SdkEnvironment sdkEnvironment =
-                instrumentingClassLoaderFactory.getSdkEnvironment(
-                        new SdkConfig(androidManifestFactory.pickSdkVersion(config, appManifest)));
 
+//        DependencyResolverFactory dependencyResolverFactory = new DependencyResolverFactory();
 
-        (new ShadowMaker()).configureShadows(sdkEnvironment, config);
+        List<FrameworkMethod> childs = getChildren();
 
+        FrameworkMethod placeholder = childs.get(0);
+
+            SdkEnvironment sdkEnvironment = getSandbox(testClass, config, placeholder);
+        configureShadows(placeholder, sdkEnvironment);
         Class bootstrappedTestClass = sdkEnvironment.bootstrappedClass(testClass);
 
         // Since we have bootstrappedClass we may properly initialize
@@ -108,7 +119,8 @@ public class ElectricSputnik extends Runner implements Filterable, Sortable {
                 try {
                     Object spec = method.invoke(sputnik);
 
-                    // Interceptor registers on construction
+                    // ElectricSpockInterceptor self-register on construction, no need to keep a ref here
+
                     sdkEnvironment
                             .bootstrappedClass(ElectricSpockInterceptor.class)
                             .getConstructor(
@@ -116,9 +128,9 @@ public class ElectricSputnik extends Runner implements Filterable, Sortable {
                                     SdkEnvironment.class,
                                     Config.class,
                                     AndroidManifest.class,
-                                    DependencyResolverFactory.class
+                                    DependencyResolver.class
                             )
-                            .newInstance(spec, sdkEnvironment, config, appManifest, dependencyResolverFactory);
+                            .newInstance(spec, sdkEnvironment, config, appManifest, getJarResolver());
 
                 } catch (IllegalAccessException | InstantiationException |
                         NoSuchMethodException | InvocationTargetException e) {
@@ -128,6 +140,20 @@ public class ElectricSputnik extends Runner implements Filterable, Sortable {
         }
 
     }
+
+    @NotNull
+    protected SdkEnvironment getSandbox(Class<?> testClass, Config config, FrameworkMethod method) {
+
+//        DependencyResolverFactory dependencyResolverFactory = new DependencyResolverFactory();
+        AndroidManifestFactory androidManifestFactory = new AndroidManifestFactory();
+        AndroidManifest appManifest = androidManifestFactory.getAppManifest(config);
+        SdkConfig sdkConfig = new SdkConfig(androidManifestFactory.pickSdkVersion(config, appManifest));
+
+        return SandboxFactory.INSTANCE.getSdkEnvironment(
+                createClassLoaderConfig(method), getJarResolver(), sdkConfig);
+
+    }
+
 
     private String getCurrentRobolectricVersion() {
 
@@ -146,18 +172,24 @@ public class ElectricSputnik extends Runner implements Filterable, Sortable {
     private void checkRobolectricVersion() {
 
         String ver = getCurrentRobolectricVersion();
-        if (!(ver.equals("3.2") ||
-                ver.indexOf("3.2.")==0 ||
-                ver.indexOf("3.2-")==0))
-            throw new RuntimeException("This version of ElectricSpock supports Robolectric 3.2 only");
+        if (!(ver.equals("3.3") ||
+                ver.indexOf("3.3.")==0 ||
+                ver.indexOf("3.3-")==0))
+            throw new RuntimeException("This version of ElectricSpock supports Robolectric 3.3 only");
     }
 
-    private InstrumentationConfiguration createClassLoaderConfig() {
-        return InstrumentationConfiguration.newBuilder()
-                .doNotAcquireClass(DependencyResolver.class.getName())
-                .doNotAcquireClass(DependencyResolverFactory.class.getName())
-                .doNotAcquireClass(ShadowProvider.class.getName())
-                .build();
+    @NotNull
+    protected Class<?>[] getExtraShadows(FrameworkMethod method) {
+        List<Class<?>> shadowClasses = new ArrayList<>();
+        addShadows(shadowClasses, getTestClass().getAnnotation(SandboxConfig.class));
+        addShadows(shadowClasses, method.getAnnotation(SandboxConfig.class));
+        return shadowClasses.toArray(new Class[shadowClasses.size()]);
+    }
+
+    private void addShadows(List<Class<?>> shadowClasses, SandboxConfig annotation) {
+        if (annotation != null) {
+            shadowClasses.addAll(asList(annotation.shadows()));
+        }
     }
 
     public Description getDescription() {
@@ -166,7 +198,7 @@ public class ElectricSputnik extends Runner implements Filterable, Sortable {
 
         Class<?> testClass = originalDesc.getTestClass();
         String title = null;
-        Annotation[] annotations = null;
+       Annotation[] annotations = null;
         if (testClass!=null) {
             annotations = testClass.getAnnotations();
             for (Annotation a : annotations) {

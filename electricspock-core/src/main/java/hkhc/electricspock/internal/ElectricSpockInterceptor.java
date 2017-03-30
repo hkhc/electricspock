@@ -27,6 +27,7 @@ import org.robolectric.annotation.Config;
 import org.robolectric.internal.ParallelUniverseInterface;
 import org.robolectric.internal.SdkConfig;
 import org.robolectric.internal.SdkEnvironment;
+import org.robolectric.internal.dependency.DependencyResolver;
 import org.robolectric.manifest.AndroidManifest;
 import org.robolectric.res.PackageResourceTable;
 import org.robolectric.res.ResourceMerger;
@@ -54,17 +55,20 @@ public class ElectricSpockInterceptor extends AbstractMethodInterceptor {
     private Config config;
     private AndroidManifest appManifest;
     private TestLifecycle<Application> testLifecycle;
-    private DependencyResolverFactory dependencyResolverFactory;
+//    private DependencyResolverFactory dependencyResolverFactory;
+    private DependencyResolver dependencyResolver;
     private static final Map<AndroidManifest, PackageResourceTable> appResourceTableCache = new HashMap<>();
     private static PackageResourceTable compiletimeSdkResourceTable;
 
     public ElectricSpockInterceptor(SpecInfo spec, SdkEnvironment sdk, Config config, AndroidManifest appManifest,
-                                    DependencyResolverFactory dependencyResolverFactory) {
+                                    DependencyResolver dependencyResolver) {
         this.spec = spec;
         this.sdkEnvironment = sdk;
         this.config = config;
         this.appManifest = appManifest;
-        this.dependencyResolverFactory = dependencyResolverFactory;
+        this.dependencyResolver = dependencyResolver;
+//        this.dependencyResolverFactory = dependencyResolverFactory;
+
         spec.addInterceptor(this);
     }
 
@@ -121,7 +125,7 @@ public class ElectricSpockInterceptor extends AbstractMethodInterceptor {
             ReflectionHelpers.setStaticField(sdkEnvironment.bootstrappedClass(Build.VERSION.class),
                     "RELEASE", sdkConfig.getAndroidVersion());
 
-            PackageResourceTable systemResourceTable = sdkEnvironment.getSystemResourceTable(dependencyResolverFactory.getJarResolver());
+            PackageResourceTable systemResourceTable = sdkEnvironment.getSystemResourceTable(dependencyResolver);
             PackageResourceTable appResourceTable = getAppResourceTable(appManifest);
 
             parallelUniverseInterface.setUpApplicationState(null, testLifecycle, appManifest, config,

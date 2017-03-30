@@ -17,56 +17,43 @@
 
 package hkhc.electricspock.internal;
 
-import org.robolectric.internal.dependency.CachedDependencyResolver;
+import org.junit.runners.model.InitializationError;
+import org.robolectric.RobolectricTestRunner;
 import org.robolectric.internal.dependency.DependencyResolver;
-import org.robolectric.internal.dependency.LocalDependencyResolver;
-import org.robolectric.internal.dependency.MavenDependencyResolver;
-import org.robolectric.internal.dependency.PropertiesDependencyResolver;
-import org.robolectric.res.Fs;
-import org.robolectric.res.FsFile;
-import org.robolectric.util.Logger;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
 
 /**
  * Created by herman on 28/12/2016.
+ * Borrow code from RobolectricTrestRunner
  */
 
 public class DependencyResolverFactory {
 
     private static DependencyResolver dependencyResolver;
 
-    public DependencyResolver getJarResolver() {
-        if (dependencyResolver == null) {
-            if (Boolean.getBoolean("robolectric.offline")) {
-                String dependencyDir = System.getProperty("robolectric.dependency.dir", ".");
-                dependencyResolver = new LocalDependencyResolver(new File(dependencyDir));
-            } else {
-                File cacheDir = new File(new File(System.getProperty("java.io.tmpdir")), "robolectric");
-
-                if (cacheDir.exists() || cacheDir.mkdir()) {
-                    Logger.info("Dependency cache location: %s", cacheDir.getAbsolutePath());
-                    dependencyResolver = new CachedDependencyResolver(new MavenDependencyResolver(), cacheDir, 60 * 60 * 24 * 1000);
-                } else {
-                    dependencyResolver = new MavenDependencyResolver();
-                }
-            }
-
-            URL buildPathPropertiesUrl = getClass().getClassLoader().getResource("robolectric-deps.properties");
-            if (buildPathPropertiesUrl != null) {
-                Logger.info("Using Robolectric classes from %s", buildPathPropertiesUrl.getPath());
-
-                FsFile propertiesFile = Fs.fileFromPath(buildPathPropertiesUrl.getFile());
-                try {
-                    dependencyResolver = new PropertiesDependencyResolver(propertiesFile, dependencyResolver);
-                } catch (IOException e) {
-                    throw new RuntimeException("couldn't read " + buildPathPropertiesUrl, e);
-                }
-            }
+    private class BorrowRobolectricTestRunner extends RobolectricTestRunner {
+        public BorrowRobolectricTestRunner() throws InitializationError {
+            super(null);
         }
+        protected DependencyResolver getJarResolver() {
+            return super.getJarResolver();
+        }
+    }
 
+    private BorrowRobolectricTestRunner borrowRobolectricTestRunner = null;
+
+    public DependencyResolverFactory() {
+        try {
+            borrowRobolectricTestRunner = new BorrowRobolectricTestRunner();
+        }
+        catch (InitializationError e) {
+            // do nothing
+        }
+    }
+
+    public DependencyResolver getJarResolver() {
+        if (dependencyResolver==null) {
+            dependencyResolver = borrowRobolectricTestRunner.getJarResolver();
+        }
         return dependencyResolver;
     }
 

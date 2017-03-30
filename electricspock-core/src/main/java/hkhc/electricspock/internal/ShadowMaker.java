@@ -49,9 +49,7 @@ public class ShadowMaker {
         }
 
         if (InvokeDynamic.ENABLED) {
-            ShadowMap oldShadowMap = sdkEnvironment.replaceShadowMap(shadowMap);
-            Set<String> invalidatedClasses = shadowMap.getInvalidatedClasses(oldShadowMap);
-            sdkEnvironment.getShadowInvalidator().invalidateClasses(invalidatedClasses);
+            sdkEnvironment.replaceShadowMap(shadowMap);
         }
 
         ClassHandler classHandler = createClassHandler(shadowMap, sdkEnvironment.getSdkConfig());
@@ -76,7 +74,7 @@ public class ShadowMaker {
      */
     @NotNull
     protected ClassHandler createClassHandler(ShadowMap shadowMap, SdkConfig sdkConfig) {
-        return new ShadowWrangler(shadowMap, sdkConfig.getApiLevel());
+        return new ShadowWrangler(shadowMap, sdkConfig.getApiLevel(), null);
     }
 
 
