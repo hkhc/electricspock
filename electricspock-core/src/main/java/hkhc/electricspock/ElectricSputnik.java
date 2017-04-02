@@ -76,10 +76,6 @@ public class ElectricSputnik extends Runner implements Filterable, Sortable {
         // Since we have bootstrappedClass we may properly initialize
         sputnik = createSputnik(testClass);
 
-        // let's manually add our initializers
-
-        System.out.println("sputnik test class : " + testClass.getName());
-
         registerSpec();
 
     }
@@ -106,7 +102,6 @@ public class ElectricSputnik extends Runner implements Filterable, Sortable {
         Constructor interceptorConstructor = getInterceptorConstructor();
 
         for(Method method : sputnik.getClass().getDeclaredMethods()) {
-            System.out.println("sputnik method name : " + method.getName());
             Object spec = getSpec(method);
             if (spec!=null) {
                 try {

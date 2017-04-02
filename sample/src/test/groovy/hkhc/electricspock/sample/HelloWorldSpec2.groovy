@@ -38,14 +38,12 @@ class HelloWorldSpec2 extends ElectricSpecification {
 
     def setup() {
         Log.d "TAG", "setup"
-        println "println setup"
         mainActivity = Robolectric.buildActivity(MainActivity).create().get()
 
     }
 
     def setupSpec() {
         Log.d "TAG", "setupSpec"
-        println "println setupSpec"
     }
 
     def "This is a test for Log"() {
