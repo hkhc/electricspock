@@ -20,7 +20,6 @@ package hkhc.electricspock.sample
 import hkhc.electricspock.ElectricSpecification
 import org.robolectric.annotation.Config
 import spock.lang.Narrative
-import spock.lang.Title
 
 /**
  * Created by herman on 28/12/2016.

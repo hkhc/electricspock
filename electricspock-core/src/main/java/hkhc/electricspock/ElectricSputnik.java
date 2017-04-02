@@ -17,8 +17,6 @@
 
 package hkhc.electricspock;
 
-import org.jetbrains.annotations.NotNull;
-import org.junit.Test;
 import org.junit.runner.Description;
 import org.junit.runner.Runner;
 import org.junit.runner.manipulation.Filter;
@@ -27,113 +25,95 @@ import org.junit.runner.manipulation.NoTestsRemainException;
 import org.junit.runner.manipulation.Sortable;
 import org.junit.runner.manipulation.Sorter;
 import org.junit.runner.notification.RunNotifier;
-import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
-import org.robolectric.RobolectricTestRunner;
-import org.robolectric.annotation.Config;
-import org.robolectric.internal.SandboxFactory;
-import org.robolectric.internal.SdkConfig;
 import org.robolectric.internal.SdkEnvironment;
-import org.robolectric.internal.bytecode.SandboxConfig;
-import org.robolectric.internal.dependency.DependencyResolver;
-import org.robolectric.manifest.AndroidManifest;
 import org.spockframework.runtime.Sputnik;
 import org.spockframework.runtime.model.SpecInfo;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 
-import hkhc.electricspock.internal.AndroidManifestFactory;
-import hkhc.electricspock.internal.ConfigFactory;
+import hkhc.electricspock.internal.ContainedRobolectricTestRunner;
 import hkhc.electricspock.internal.ElectricSpockInterceptor;
 import spock.lang.Title;
-
-import static java.util.Arrays.asList;
 
 /**
  * Created by herman on 27/12/2016.
  * Test Runner
  */
 
-public class ElectricSputnik extends RobolectricTestRunner {
+public class ElectricSputnik extends Runner implements Filterable, Sortable {
 
-    private Object sputnik;
+    private SdkEnvironment sdkEnvironment;
+
+    /* it is used to setup Robolectric infrastructure, and not used to run actual test cases */
+    private ContainedRobolectricTestRunner containedRunner;
+
+    /* the real test runner to run test classes. It is enclosed by ElectricSputnik so that it is
+    run within Robolectric interception
+     */
+    private Runner sputnik;
 
     static {
         new SecureRandom(); // this starts up the Poller SunPKCS11-Darwin thread early, outside of any Robolectric classloader
     }
 
-    public static class AAA {
-        @Test
-        public void testOne() {
-
-        }
-    }
-
     public ElectricSputnik(Class<?> testClass)  throws InitializationError {
 
-        super(AAA.class);
-
+        /* The project is so sensitive to the version of Robolectric, that we strictly check
+        its version before proceed
+         */
         checkRobolectricVersion();
 
-        Config config = (new ConfigFactory()).getConfig(testClass);
-
-        AndroidManifestFactory androidManifestFactory = new AndroidManifestFactory();
-        AndroidManifest appManifest = androidManifestFactory.getAppManifest(config);
-
-//        DependencyResolverFactory dependencyResolverFactory = new DependencyResolverFactory();
-
-        List<FrameworkMethod> childs = getChildren();
-
-        FrameworkMethod placeholder = childs.get(0);
-
-            SdkEnvironment sdkEnvironment = getSandbox(testClass, config, placeholder);
-        configureShadows(placeholder, sdkEnvironment);
-        Class bootstrappedTestClass = sdkEnvironment.bootstrappedClass(testClass);
+        containedRunner = new ContainedRobolectricTestRunner();
+        sdkEnvironment = containedRunner.getContainedSdkEnvironment();
 
         // Since we have bootstrappedClass we may properly initialize
+        sputnik = createSputnik(testClass);
+
+        // let's manually add our initializers
+
+        System.out.println("sputnik test class : " + testClass.getName());
+
+        registerSpec();
+
+    }
+
+    private Runner createSputnik(Class<?> testClass) {
+
+        Class bootstrappedTestClass = sdkEnvironment.bootstrappedClass(testClass);
 
         try {
 
-            this.sputnik = sdkEnvironment
+            return (Runner)sdkEnvironment
                     .bootstrappedClass(Sputnik.class)
                     .getConstructor(Class.class)
                     .newInstance(bootstrappedTestClass);
-
 
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
-        // let's manually add our initializers
+    }
+
+    private void registerSpec() {
+
+        Constructor interceptorConstructor = getInterceptorConstructor();
 
         for(Method method : sputnik.getClass().getDeclaredMethods()) {
-            if(method.getName().equals("getSpec")) {
-                method.setAccessible(true);
+            System.out.println("sputnik method name : " + method.getName());
+            Object spec = getSpec(method);
+            if (spec!=null) {
                 try {
-                    Object spec = method.invoke(sputnik);
-
                     // ElectricSpockInterceptor self-register on construction, no need to keep a ref here
-
-                    sdkEnvironment
-                            .bootstrappedClass(ElectricSpockInterceptor.class)
-                            .getConstructor(
-                                    sdkEnvironment.bootstrappedClass(SpecInfo.class),
-                                    SdkEnvironment.class,
-                                    Config.class,
-                                    AndroidManifest.class,
-                                    DependencyResolver.class
-                            )
-                            .newInstance(spec, sdkEnvironment, config, appManifest, getJarResolver());
-
-                } catch (IllegalAccessException | InstantiationException |
-                        NoSuchMethodException | InvocationTargetException e) {
+                    interceptorConstructor.newInstance(spec, containedRunner);
+                }
+                catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
                     throw new RuntimeException(e);
                 }
             }
@@ -141,19 +121,39 @@ public class ElectricSputnik extends RobolectricTestRunner {
 
     }
 
-    @NotNull
-    protected SdkEnvironment getSandbox(Class<?> testClass, Config config, FrameworkMethod method) {
+    private Object getSpec(Method method) {
 
-//        DependencyResolverFactory dependencyResolverFactory = new DependencyResolverFactory();
-        AndroidManifestFactory androidManifestFactory = new AndroidManifestFactory();
-        AndroidManifest appManifest = androidManifestFactory.getAppManifest(config);
-        SdkConfig sdkConfig = new SdkConfig(androidManifestFactory.pickSdkVersion(config, appManifest));
-
-        return SandboxFactory.INSTANCE.getSdkEnvironment(
-                createClassLoaderConfig(method), getJarResolver(), sdkConfig);
-
+        if (method.getName().equals("getSpec")) {
+            method.setAccessible(true);
+            try {
+                return method.invoke(sputnik);
+            }
+            catch (IllegalAccessException | InvocationTargetException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        else {
+            return null;
+        }
     }
 
+    private Constructor getInterceptorConstructor() {
+
+        try {
+            return sdkEnvironment
+                    .bootstrappedClass(ElectricSpockInterceptor.class)
+                    .getConstructor(
+                            sdkEnvironment.bootstrappedClass(SpecInfo.class),
+                            ContainedRobolectricTestRunner.class
+                    );
+        }
+        catch (NoSuchMethodException e) {
+            // it should not happen in production code as the class
+            // ElectricSpockInterceptor is known
+            throw new RuntimeException(e);
+        }
+
+    }
 
     private String getCurrentRobolectricVersion() {
 
@@ -178,50 +178,33 @@ public class ElectricSputnik extends RobolectricTestRunner {
             throw new RuntimeException("This version of ElectricSpock supports Robolectric 3.3 only");
     }
 
-    @NotNull
-    protected Class<?>[] getExtraShadows(FrameworkMethod method) {
-        List<Class<?>> shadowClasses = new ArrayList<>();
-        addShadows(shadowClasses, getTestClass().getAnnotation(SandboxConfig.class));
-        addShadows(shadowClasses, method.getAnnotation(SandboxConfig.class));
-        return shadowClasses.toArray(new Class[shadowClasses.size()]);
-    }
-
-    private void addShadows(List<Class<?>> shadowClasses, SandboxConfig annotation) {
-        if (annotation != null) {
-            shadowClasses.addAll(asList(annotation.shadows()));
-        }
-    }
-
     public Description getDescription() {
 
-        Description originalDesc = ((Runner) sputnik).getDescription();
+        Description originalDesc = sputnik.getDescription();
 
         Class<?> testClass = originalDesc.getTestClass();
+        if (testClass==null) throw new RuntimeException("Unexpected null testClass");
+
         String title = null;
-       Annotation[] annotations = null;
-        if (testClass!=null) {
-            annotations = testClass.getAnnotations();
-            for (Annotation a : annotations) {
-                if (a instanceof Title) {
-                    title = ((Title) a).value();
-                    break;
-                }
+        Annotation[] annotations = testClass.getAnnotations();
+        for (Annotation a : annotations) {
+            if (a instanceof Title) {
+                title = ((Title) a).value();
+                break;
             }
         }
-
 
         Description overridedDesc = Description.createSuiteDescription(
                 title==null ? testClass.getName() : title
         );
-        for(Description d : originalDesc.getChildren()) {
-            overridedDesc.addChild(d);
-        }
+        originalDesc.getChildren().forEach(overridedDesc::addChild);
+
         return overridedDesc;
 
     }
 
     public void run(RunNotifier notifier) {
-        ((Runner) sputnik).run(notifier);
+        sputnik.run(notifier);
     }
 
     public void filter(Filter filter) throws NoTestsRemainException {

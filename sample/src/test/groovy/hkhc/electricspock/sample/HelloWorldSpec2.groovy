@@ -34,9 +34,23 @@ C for cat
 """)
 class HelloWorldSpec2 extends ElectricSpecification {
 
+    def mainActivity
+
+    def setup() {
+        Log.d "TAG", "setup"
+        println "println setup"
+        mainActivity = Robolectric.buildActivity(MainActivity).create().get()
+
+    }
+
+    def setupSpec() {
+        Log.d "TAG", "setupSpec"
+        println "println setupSpec"
+    }
+
     def "This is a test for Log"() {
         given: "This is a given block"
-        def mainActivity = Robolectric.buildActivity(MainActivity).create().get()
+//        def mainActivity = Robolectric.buildActivity(MainActivity).create().get()
 
         when: "This is a when block"
         Log.d("TAG", "Hello")
@@ -49,7 +63,7 @@ class HelloWorldSpec2 extends ElectricSpecification {
 
     def "This is a test for Log 2"() {
         given:
-        def mainActivity = Robolectric.buildActivity(MainActivity).create().get()
+//        def mainActivity = Robolectric.buildActivity(MainActivity).create().get()
 
         when:
         Log.d("TAG", "Hello")

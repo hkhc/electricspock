@@ -19,7 +19,9 @@ apply plugin: 'java'
 apply plugin: 'groovy'
 apply plugin: 'maven'
 
-group = 'com.github.hkhc'
+artifactId='electricspock'
+group='hkhc.electricspock'
+
 def coreProject = 'electricspock-core'
 
 // Include the classes from core electricspock project
@@ -39,8 +41,8 @@ jar {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
-    compile 'org.codehaus.groovy:groovy-all:2.4.7'
-    compile "org.spockframework:spock-core:1.1-groovy-2.4-rc-3"
+    compile 'org.codehaus.groovy:groovy-all:2.4.10'
+    compile "org.spockframework:spock-core:1.1-groovy-2.4-rc-4"
     compile 'cglib:cglib-nodep:3.2.4'
 
 //    testCompile 'net.bytebuddy:byte-buddy:1.6.3'
@@ -49,6 +51,7 @@ dependencies {
     compile 'junit:junit:4.12'
 
     compileOnly project(':'+coreProject)
+//    compile project(':'+coreProject)
 
 }
 

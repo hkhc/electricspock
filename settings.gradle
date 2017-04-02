@@ -1,4 +1,3 @@
-include ':electricspock-core'
 /*
  * Copyright 2016 Herman Cheung
  *
@@ -16,4 +15,4 @@ include ':electricspock-core'
  *
  */
 
-include 'electricspock', 'electricspock-core', 'sample'
+include 'electricspock-electricspock', 'electricspock-core', 'sample'

@@ -20,7 +20,7 @@ apply plugin: 'groovyx.android'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.0"
+    buildToolsVersion "25.0.2"
     defaultConfig {
         applicationId "hkhc.electricspock.sample"
         minSdkVersion 24
@@ -37,22 +37,24 @@ android {
     }
 }
 
-
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:25.0.1'
+    compile 'com.android.support:appcompat-v7:25.3.1'
     testCompile 'junit:junit:4.12'
-    testCompile 'org.codehaus.groovy:groovy-all:2.4.7'
-    testCompile 'org.spockframework:spock-core:1.1-groovy-2.4-rc-3'
-    testCompile 'org.robolectric:robolectric:3.3.1'
-    testCompile project(':electricspock-core')
-    testCompile project(':electricspock')
+    testCompile 'org.codehaus.groovy:groovy-all:2.4.10'
+    testCompile 'org.spockframework:spock-core:1.1-groovy-2.4-rc-4'
+    testCompile 'org.robolectric:robolectric:3.3.2'
+    //testCompile project(':electricspock-core')
+    compile project(':electricspock-electricspock')
 //    testCompile( 'com.athaydes:spock-reports:1.2.13' ) {
 //        transitive = false // this avoids affecting your version of Groovy/Spock
 //    }
 //    testCompile 'org.slf4j:slf4j-api:1.7.13' // needed by spock-reports
 //    testCompile 'org.slf4j:slf4j-simple:1.7.13' // needed by spock-reports
 }
+
+sourceCompatibility = "1.7"
+targetCompatibility = "1.7"
