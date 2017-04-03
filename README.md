@@ -4,6 +4,8 @@
 
 ## What's new
 
+The latest version is 0.5.0.1
+
 Version 0.5 Compatible with Robolectric 3.3.x. Reorganize yet again, maximal reuse of code from RobolectricTestRunner
 
 Version 0.4 reorganize code structure, new ElectricSuite class
@@ -45,7 +47,7 @@ Add the dependency
 
 ```groovy
 	dependencies {
-		testCompile 'com.github.hkhc:electricspock:0.5'
+		testCompile 'com.github.hkhc:electricspock:0.5.0.1'
 	}
 ```
 
