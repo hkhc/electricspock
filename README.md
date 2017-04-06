@@ -109,4 +109,4 @@ of `ElectricSuite`.
 * (ElecrtricSpock 0.5 fixed this) ~~When using with [Spock-reporting-plugin](https://github.com/renatoathaydes/spock-reports), all inner classes
 of the same `ElectricSuite` class shall have the same base class. i.e. Either all of them extend from `ElectricSpecification`
 or `Specification`. Mix of different base classes will cause exception in the reporting plugin.
-It will be something like `OverlappingFileLockException`. ~~
+It will be something like `OverlappingFileLockException`.~~
