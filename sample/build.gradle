@@ -35,6 +35,18 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    testOptions {
+        unitTests.all {
+            // All the usual Gradle options.
+            testLogging {
+                events "passed", "skipped", "failed", "standardOut", "standardError"
+                outputs.upToDateWhen {false}
+                showStandardStreams = true
+            }
+        }
+    }
+
 }
 
 dependencies {
@@ -47,14 +59,14 @@ dependencies {
     testCompile 'org.codehaus.groovy:groovy-all:2.4.10'
     testCompile 'org.spockframework:spock-core:1.1-groovy-2.4-rc-4'
     testCompile 'org.robolectric:robolectric:3.3.2'
-    //testCompile project(':electricspock-core')
     compile project(':electricspock-electricspock')
-//    testCompile( 'com.athaydes:spock-reports:1.2.13' ) {
-//        transitive = false // this avoids affecting your version of Groovy/Spock
-//    }
-//    testCompile 'org.slf4j:slf4j-api:1.7.13' // needed by spock-reports
-//    testCompile 'org.slf4j:slf4j-simple:1.7.13' // needed by spock-reports
+    testCompile( 'com.athaydes:spock-reports:1.2.13' ) {
+        transitive = false // this avoids affecting your version of Groovy/Spock
+    }
+    testCompile 'org.slf4j:slf4j-api:1.7.13' // needed by spock-reports
+    testCompile 'org.slf4j:slf4j-simple:1.7.13' // needed by spock-reports
 }
 
 sourceCompatibility = "1.7"
 targetCompatibility = "1.7"
+
