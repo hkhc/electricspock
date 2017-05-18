@@ -167,9 +167,9 @@ public class ElectricSputnik extends Runner implements Filterable, Sortable {
     private void checkRobolectricVersion() {
 
         String ver = getCurrentRobolectricVersion();
-        if (!(ver.equals("3.3") ||
-                ver.indexOf("3.3.")==0 ||
-                ver.indexOf("3.3-")==0))
+        if (!(ver.equals("3.4") ||
+                ver.indexOf("3.4.")==0 ||
+                ver.indexOf("3.4-")==0))
             throw new RuntimeException("This version of ElectricSpock supports Robolectric 3.3 only");
     }
 
@@ -192,7 +192,9 @@ public class ElectricSputnik extends Runner implements Filterable, Sortable {
         Description overridedDesc = Description.createSuiteDescription(
                 title==null ? testClass.getName() : title
         );
-        originalDesc.getChildren().forEach(overridedDesc::addChild);
+        for(Description d: originalDesc.getChildren()) {
+            overridedDesc.addChild(d);
+        }
 
         return overridedDesc;
 
