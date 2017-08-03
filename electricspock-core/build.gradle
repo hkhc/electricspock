@@ -28,11 +28,11 @@ sourceCompatibility = '1.7'
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
-    compile "org.robolectric:robolectric:3.4-rc2", {
+    compile "org.robolectric:robolectric:3.4", {
         exclude group:'junit', module: 'junit'
     }
 
-    compile 'org.codehaus.groovy:groovy-all:2.4.10'
+    compile 'org.codehaus.groovy:groovy-all:2.4.12'
     compile "org.spockframework:spock-core:1.1-groovy-2.4"
 
     compile 'org.jetbrains:annotations-java5:15.0'

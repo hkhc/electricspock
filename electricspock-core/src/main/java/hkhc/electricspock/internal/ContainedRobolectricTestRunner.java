@@ -4,9 +4,11 @@ import org.junit.Test;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
 import org.robolectric.internal.SdkEnvironment;
 import org.robolectric.internal.bytecode.InstrumentationConfiguration;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.List;
 
@@ -16,6 +18,7 @@ import java.util.List;
 
 public class ContainedRobolectricTestRunner extends RobolectricTestRunner {
 
+    private Class<?> specClass = null;
     private FrameworkMethod placeholderMethod = null;
     private SdkEnvironment sdkEnvironment = null;
 
@@ -36,8 +39,9 @@ public class ContainedRobolectricTestRunner extends RobolectricTestRunner {
     method. Just use it to trigger all initialization of Robolectric infrastructure, and use it
     for running Spock specification.
      */
-    public ContainedRobolectricTestRunner() throws InitializationError {
+    public ContainedRobolectricTestRunner(Class<?> specClass) throws InitializationError {
         super(PlaceholderTest.class);
+        this.specClass = specClass;
     }
 
     private FrameworkMethod getPlaceHolderMethod() {
@@ -103,6 +107,27 @@ public class ContainedRobolectricTestRunner extends RobolectricTestRunner {
 
     public void containedAfterTest() {
         super.afterTest(getPlaceHolderMethod(), getBootstrapedMethod());
+    }
+
+    @Override
+    public Config getConfig(Method method) {
+        System.out.println("getConfig "+specClass);
+        Annotation[] annotations = specClass.getAnnotations();
+        for(Annotation a : annotations) {
+            System.out.println("annotation : " + a.annotationType());
+        }
+        Config config = specClass.getAnnotation(Config.class);
+        if (config==null) {
+            System.out.println("config is null");
+            return super.getConfig(method);
+//            return new Config.Builder(buildGlobalConfig()).build();
+        }
+        else {
+            System.out.println("config " + config.manifest());
+            return new Config.Builder(buildGlobalConfig()).overlay(config).build();
+        }
+
+//        return configMerger.getConfig(specClass, method, buildGlobalConfig());
     }
 
 

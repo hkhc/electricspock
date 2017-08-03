@@ -70,7 +70,7 @@ public class ElectricSputnik extends Runner implements Filterable, Sortable {
          */
         checkRobolectricVersion();
 
-        containedRunner = new ContainedRobolectricTestRunner();
+        containedRunner = new ContainedRobolectricTestRunner(testClass);
         sdkEnvironment = containedRunner.getContainedSdkEnvironment();
 
         // Since we have bootstrappedClass we may properly initialize
@@ -164,13 +164,19 @@ public class ElectricSputnik extends Runner implements Filterable, Sortable {
 
     }
 
+    private boolean isVersion(String version, String prefix) {
+
+        return version.equals(prefix) ||
+                version.indexOf(prefix+".")==0 ||
+                version.indexOf(prefix+"-")==0;
+
+    }
+
     private void checkRobolectricVersion() {
 
         String ver = getCurrentRobolectricVersion();
-        if (!(ver.equals("3.4") ||
-                ver.indexOf("3.4.")==0 ||
-                ver.indexOf("3.4-")==0))
-            throw new RuntimeException("This version of ElectricSpock supports Robolectric 3.3 only");
+        if (!isVersion(ver, "3.3") && !isVersion(ver, "3.4"))
+            throw new RuntimeException("This version of ElectricSpock supports Robolectric 3.3 or 3.4 only");
     }
 
     public Description getDescription() {
