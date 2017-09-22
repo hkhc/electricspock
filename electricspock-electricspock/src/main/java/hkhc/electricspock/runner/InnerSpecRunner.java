@@ -65,7 +65,6 @@ public class InnerSpecRunner extends Suite {
 
     @Override
     public Description getDescription() {
-        System.out.println("getDescription : " );
         Description d = super.getDescription();
         dumpDescription(d);
         return d;
@@ -82,7 +81,6 @@ public class InnerSpecRunner extends Suite {
     }
 
     private void dumpDescription(int level, Description d) {
-        System.out.println(getSpace(level*4) + d + " [cls:"+d.getTestClass()+"] [clsName:"+d.getClassName()+"] [disp:"+d.getDisplayName()+"]");
         for(Description c : d.getChildren()) {
             dumpDescription(level+1, c);
         }
@@ -105,13 +103,10 @@ public class InnerSpecRunner extends Suite {
             }
         }
         if (title!=null) {
-            System.out.println("title : " + title);
             Description newD = Description.createSuiteDescription(title, annotations);
-            System.out.println("newD [cls:"+newD.getTestClass()+"] [displayName:"+newD.getDisplayName()+"]");
             for(Description childD : d.getChildren()) {
                 newD.addChild(Description.createTestDescription(newD.getTestClass(), childD.getDisplayName()));
             }
-            System.out.println("CP1");
             dumpDescription(newD);
             return newD;
         }

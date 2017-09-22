@@ -111,23 +111,15 @@ public class ContainedRobolectricTestRunner extends RobolectricTestRunner {
 
     @Override
     public Config getConfig(Method method) {
-        System.out.println("getConfig "+specClass);
         Annotation[] annotations = specClass.getAnnotations();
-        for(Annotation a : annotations) {
-            System.out.println("annotation : " + a.annotationType());
-        }
         Config config = specClass.getAnnotation(Config.class);
         if (config==null) {
-            System.out.println("config is null");
             return super.getConfig(method);
-//            return new Config.Builder(buildGlobalConfig()).build();
         }
         else {
-            System.out.println("config " + config.manifest());
             return new Config.Builder(buildGlobalConfig()).overlay(config).build();
         }
 
-//        return configMerger.getConfig(specClass, method, buildGlobalConfig());
     }
 
 

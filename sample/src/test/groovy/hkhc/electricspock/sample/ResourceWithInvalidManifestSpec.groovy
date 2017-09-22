@@ -14,9 +14,10 @@ class ResourceWithInvalidManifestSpec extends ElectricSpecification {
 
     def "Test cases shall fail when access Android resources with non exist AndroidManifest.xml"() {
         given:
-            Context context = RuntimeEnvironment.application;
+            Context context = RuntimeEnvironment.application
+            println "Expect to see warning that \"No manifest file found\" above."
         when: "Access resource"
-            String appName = context.getResources().getString(R.string.app_name);
+            String appName = context.getResources().getString(R.string.app_name)
         then: "we get exception"
             thrown Resources.NotFoundException
 
