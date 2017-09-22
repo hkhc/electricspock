@@ -4,7 +4,9 @@
 
 ## What's new
 
-The latest version is 0.5.0.1
+The latest version is 0.6
+
+Version 0.6 supports @Config annotation of Robolectric, and tested with Robolectric 3.4.2.
 
 Version 0.5 Compatible with Robolectric 3.3.x. Reorganize yet again, maximal reuse of code from RobolectricTestRunner
 
@@ -26,7 +28,7 @@ The Android test framework [Robolectric](https://github.com/robolectric/robolect
 
 It is heavily based on RoboSpock project. It borrow a lot of code from there, and make some tweak of my own. This project is never possible without the excellent foundation.
 
-Current version (0.5) of the library is tested with Robolectric 3.3.2.
+Current version (0.6) of the library is tested with Robolectric 3.4.2.
 
 # Installation (Gradle)
 
@@ -47,7 +49,7 @@ Add the dependency
 
 ```groovy
 	dependencies {
-		testCompile 'com.github.hkhc:electricspock:0.5.0.1'
+		testCompile 'com.github.hkhc:electricspock:0.6'
 	}
 ```
 
