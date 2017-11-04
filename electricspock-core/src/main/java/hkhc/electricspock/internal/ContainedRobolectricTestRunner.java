@@ -20,9 +20,10 @@ import spock.lang.Specification;
 
 public class ContainedRobolectricTestRunner extends RobolectricTestRunner {
 
-    private Class<?> specClass = null;
+    private Class<? extends Specification> specClass = null;
     private FrameworkMethod placeholderMethod = null;
     private SdkEnvironment sdkEnvironment = null;
+    private Method bootstrapedMethod = null;
 
     /*
     A place holder test class to obtain a proper FrameworkMethod (which is actually a
@@ -58,6 +59,15 @@ public class ContainedRobolectricTestRunner extends RobolectricTestRunner {
     }
 
     private Method getBootstrapedMethod() {
+
+        if (bootstrapedMethod==null) {
+            bootstrapedMethod = createBootstrapedMethod();
+        }
+        return bootstrapedMethod;
+
+    }
+
+    Method createBootstrapedMethod() {
 
         FrameworkMethod placeholderMethod = getPlaceHolderMethod();
         SdkEnvironment sdkEnvironment = getContainedSdkEnvironment();
