@@ -30,13 +30,11 @@ import org.robolectric.internal.SdkEnvironment;
 import org.spockframework.runtime.Sputnik;
 import org.spockframework.runtime.model.SpecInfo;
 
-import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.SecureRandom;
-import java.util.Properties;
 
 import hkhc.electricspock.internal.ContainedRobolectricTestRunner;
 import hkhc.electricspock.internal.ElectricSpockInterceptor;
@@ -68,7 +66,7 @@ public class ElectricSputnik extends Runner implements Filterable, Sortable {
         /* The project is so sensitive to the version of Robolectric, that we strictly check
         its version before proceed
          */
-        checkRobolectricVersion();
+        (new RobolectricVersionChecker()).checkRobolectricVersion();
 
         containedRunner = new ContainedRobolectricTestRunner(testClass);
         sdkEnvironment = containedRunner.getContainedSdkEnvironment();
@@ -150,34 +148,6 @@ public class ElectricSputnik extends Runner implements Filterable, Sortable {
 
     }
 
-    private String getCurrentRobolectricVersion() {
-
-        try {
-            Properties prop = new Properties();
-            prop.load(getClass().getClassLoader().getResourceAsStream("robolectric-version.properties"));
-            return prop.getProperty("robolectric.version");
-        }
-        catch (IOException e) {
-            return "Unknown";
-        }
-
-
-    }
-
-    private boolean isVersion(String version, String prefix) {
-
-        return version.equals(prefix) ||
-                version.indexOf(prefix+".")==0 ||
-                version.indexOf(prefix+"-")==0;
-
-    }
-
-    private void checkRobolectricVersion() {
-
-        String ver = getCurrentRobolectricVersion();
-        if (!isVersion(ver, "3.3") && !isVersion(ver, "3.4"))
-            throw new RuntimeException("This version of ElectricSpock supports Robolectric 3.3 or 3.4 only");
-    }
 
     public Description getDescription() {
 
