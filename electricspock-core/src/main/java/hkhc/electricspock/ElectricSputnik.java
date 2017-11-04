@@ -79,6 +79,12 @@ public class ElectricSputnik extends Runner implements Filterable, Sortable {
 
     }
 
+    /**
+     *     Sputnik is the test runner for Spock specification. This method Load the spec class and
+     *     Sputnik class with Robolectric sandbox, so that Robolectric can intercept the Android API
+     *     code. That's how we bridge Spock framework and Robolectric together.
+     *     @param specClass the Specification class to be run under Sputnik
+     */
     private Runner createSputnik(Class<? extends Specification> specClass) {
 
         Class bootstrappedTestClass = sdkEnvironment.bootstrappedClass(specClass);
@@ -106,8 +112,11 @@ public class ElectricSputnik extends Runner implements Filterable, Sortable {
                 try {
                     // ElectricSpockInterceptor self-register on construction, no need to keep a ref here
                     interceptorConstructor.newInstance(spec, containedRunner);
-                }
-                catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                } catch (InvocationTargetException e) {
+                    throw new RuntimeException(e);
+                } catch (InstantiationException e) {
                     throw new RuntimeException(e);
                 }
             }
@@ -121,8 +130,9 @@ public class ElectricSputnik extends Runner implements Filterable, Sortable {
             method.setAccessible(true);
             try {
                 return method.invoke(sputnik);
-            }
-            catch (IllegalAccessException | InvocationTargetException e) {
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            } catch (InvocationTargetException e) {
                 throw new RuntimeException(e);
             }
         }
@@ -131,6 +141,10 @@ public class ElectricSputnik extends Runner implements Filterable, Sortable {
         }
     }
 
+    /**
+     * Get a sandboxed constructor of interceptor
+     * @return
+     */
     private Constructor getInterceptorConstructor() {
 
         try {
