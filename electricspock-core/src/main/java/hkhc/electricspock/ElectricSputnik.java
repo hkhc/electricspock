@@ -38,6 +38,7 @@ import java.security.SecureRandom;
 
 import hkhc.electricspock.internal.ContainedRobolectricTestRunner;
 import hkhc.electricspock.internal.ElectricSpockInterceptor;
+import spock.lang.Specification;
 import spock.lang.Title;
 
 /**
@@ -61,26 +62,26 @@ public class ElectricSputnik extends Runner implements Filterable, Sortable {
         new SecureRandom(); // this starts up the Poller SunPKCS11-Darwin thread early, outside of any Robolectric classloader
     }
 
-    public ElectricSputnik(Class<?> testClass)  throws InitializationError {
+    public ElectricSputnik(Class<? extends Specification> specClass)  throws InitializationError {
 
         /* The project is so sensitive to the version of Robolectric, that we strictly check
         its version before proceed
          */
         (new RobolectricVersionChecker()).checkRobolectricVersion();
 
-        containedRunner = new ContainedRobolectricTestRunner(testClass);
+        containedRunner = new ContainedRobolectricTestRunner(specClass);
         sdkEnvironment = containedRunner.getContainedSdkEnvironment();
 
         // Since we have bootstrappedClass we may properly initialize
-        sputnik = createSputnik(testClass);
+        sputnik = createSputnik(specClass);
 
         registerSpec();
 
     }
 
-    private Runner createSputnik(Class<?> testClass) {
+    private Runner createSputnik(Class<? extends Specification> specClass) {
 
-        Class bootstrappedTestClass = sdkEnvironment.bootstrappedClass(testClass);
+        Class bootstrappedTestClass = sdkEnvironment.bootstrappedClass(specClass);
 
         try {
 

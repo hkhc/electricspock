@@ -12,6 +12,8 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.List;
 
+import spock.lang.Specification;
+
 /**
  * Created by hermanc on 31/3/2017.
  */
@@ -39,7 +41,7 @@ public class ContainedRobolectricTestRunner extends RobolectricTestRunner {
     method. Just use it to trigger all initialization of Robolectric infrastructure, and use it
     for running Spock specification.
      */
-    public ContainedRobolectricTestRunner(Class<?> specClass) throws InitializationError {
+    public ContainedRobolectricTestRunner(Class<? extends Specification> specClass) throws InitializationError {
         super(PlaceholderTest.class);
         this.specClass = specClass;
     }
