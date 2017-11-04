@@ -53,6 +53,9 @@ public class ElectricSputnik extends Runner implements Filterable, Sortable {
     /* it is used to setup Robolectric infrastructure, and not used to run actual test cases */
     private ContainedRobolectricTestRunner containedRunner;
 
+    /* Used to check if object of proper class is obtained from getSpec method */
+    private Class specInfoClass;
+
     /* the real test runner to run test classes. It is enclosed by ElectricSputnik so that it is
     run within Robolectric interception
      */
@@ -71,6 +74,7 @@ public class ElectricSputnik extends Runner implements Filterable, Sortable {
 
         containedRunner = new ContainedRobolectricTestRunner(specClass);
         sdkEnvironment = containedRunner.getContainedSdkEnvironment();
+        specInfoClass = sdkEnvironment.bootstrappedClass(SpecInfo.class);
 
         // Since we have bootstrappedClass we may properly initialize
         sputnik = createSputnik(specClass);
@@ -102,16 +106,20 @@ public class ElectricSputnik extends Runner implements Filterable, Sortable {
 
     }
 
+    /**
+     * Register an interceptor to specInfo of every method in specification.
+     */
     private void registerSpec() {
 
         Constructor interceptorConstructor = getInterceptorConstructor();
 
         for(Method method : sputnik.getClass().getDeclaredMethods()) {
-            Object spec = getSpec(method);
-            if (spec!=null) {
+            Object specInfo = getSpec(method);
+            if (specInfo!=null) {
                 try {
-                    // ElectricSpockInterceptor self-register on construction, no need to keep a ref here
-                    interceptorConstructor.newInstance(spec, containedRunner);
+                    // ElectricSpockInterceptor register itself to SpecInfo on construction,
+                    // no need to keep a ref here
+                    interceptorConstructor.newInstance(specInfo, containedRunner);
                 } catch (IllegalAccessException e) {
                     throw new RuntimeException(e);
                 } catch (InvocationTargetException e) {
@@ -124,12 +132,23 @@ public class ElectricSputnik extends Runner implements Filterable, Sortable {
 
     }
 
+    /**
+     * Get the SpecInfo from Specification. However, the SpecInfo instance it return will be under
+     * Robolectric sandbox, so it cannot be casted directly to SpecInfo statically.
+     * @param method the getSpec method
+     * @return the SpecInfo object loaded under Robolectric sandbox
+     */
     private Object getSpec(Method method) {
 
         if (method.getName().equals("getSpec")) {
             method.setAccessible(true);
             try {
-                return method.invoke(sputnik);
+                Object specInfo = method.invoke(sputnik);
+                if (specInfo.getClass()!=specInfoClass) {
+                    throw new RuntimeException("Failed to obtain SpecInfo instance from getSpec method. Instance of '"
+                            +specInfo.getClass().getName()+"' is obtained");
+                }
+                return specInfo;
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             } catch (InvocationTargetException e) {
@@ -151,7 +170,7 @@ public class ElectricSputnik extends Runner implements Filterable, Sortable {
             return sdkEnvironment
                     .bootstrappedClass(ElectricSpockInterceptor.class)
                     .getConstructor(
-                            sdkEnvironment.bootstrappedClass(SpecInfo.class),
+                            specInfoClass,
                             ContainedRobolectricTestRunner.class
                     );
         }
