@@ -40,8 +40,11 @@ public class ElectricSpockInterceptor extends AbstractMethodInterceptor {
 
 
 
-    /*
-    Migrate from RobolectricTestRunner.methodBlock
+    /**
+        Migrate from RobolectricTestRunner.methodBlock
+        Replace the classloader by Robolectric's when executing a specification. Restore it when
+        execution finished.
+        @param invocation The method invocation to be intercept
      */
     @Override
     public void interceptSpecExecution(IMethodInvocation invocation) throws Throwable {

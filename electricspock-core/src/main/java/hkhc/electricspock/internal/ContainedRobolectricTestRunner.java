@@ -39,14 +39,14 @@ public class ContainedRobolectricTestRunner extends RobolectricTestRunner {
     /*
     Pretend to be a test runner for the placeholder test class. We don't actually run that test
     method. Just use it to trigger all initialization of Robolectric infrastructure, and use it
-    for running Spock specification.
+    to run Spock specification.
      */
     public ContainedRobolectricTestRunner(Class<? extends Specification> specClass) throws InitializationError {
         super(PlaceholderTest.class);
         this.specClass = specClass;
     }
 
-    private FrameworkMethod getPlaceHolderMethod() {
+    FrameworkMethod getPlaceHolderMethod() {
 
         if (placeholderMethod==null) {
             List<FrameworkMethod> childs = getChildren();
@@ -111,6 +111,13 @@ public class ContainedRobolectricTestRunner extends RobolectricTestRunner {
         super.afterTest(getPlaceHolderMethod(), getBootstrapedMethod());
     }
 
+    /**
+     * Get @Config declaration from class or method declaration.
+     * If @Config is not available at method declaration, we delegate the task to the original
+     * RobolectricTestRunner. We build our own config from @Config annotation at method declaration
+     * @param method Find the @Config annotation at method
+     * @return The Config object it found
+     */
     @Override
     public Config getConfig(Method method) {
         Annotation[] annotations = specClass.getAnnotations();
