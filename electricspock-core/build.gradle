@@ -46,5 +46,8 @@ dependencies {
     compile 'org.jetbrains:annotations-java5:15.0'
     provided 'org.robolectric:android-all:7.1.0_r7-robolectric-0'
     compile 'junit:junit:4.12'
+
+    testCompile 'org.assertj:assertj-core:1.7.1'
+
 }
 
