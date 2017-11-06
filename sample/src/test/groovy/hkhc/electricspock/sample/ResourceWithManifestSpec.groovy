@@ -4,12 +4,11 @@ import android.content.Context
 import hkhc.electricspock.ElectricSpecification
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
-import org.robolectric.manifest.AndroidManifest
 
 /**
  * Created by hermanc on 2/8/2017.
  */
-@Config(manifest="src/main/AndroidManifest.xml")
+@Config(manifest="AndroidManifest.xml")
 class ResourceWithManifestSpec extends ElectricSpecification {
 
     def "Test cases shall be able to access Android resources with AndroidManifest.xml"() {
