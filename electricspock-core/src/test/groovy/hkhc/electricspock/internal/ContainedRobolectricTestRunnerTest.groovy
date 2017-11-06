@@ -115,7 +115,7 @@ class ContainedRobolectricTestRunnerTest {
         config = runner.getConfig(ConfigAnnotatedSpec2.getMethod("placeholder"))
 
         // then
-        assertThat config.manifest isEqualTo Config.DEFAULT_VALUE_STRING
+        assertThat config.manifest isEqualTo Config.DEFAULT_MANIFEST_NAME
         assertThat config.packageName isEqualTo "hkhc.testpackage"
 
     }

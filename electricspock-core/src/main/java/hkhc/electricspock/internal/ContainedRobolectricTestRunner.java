@@ -1,5 +1,6 @@
 package hkhc.electricspock.internal;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
@@ -8,14 +9,13 @@ import org.robolectric.annotation.Config;
 import org.robolectric.internal.SdkEnvironment;
 import org.robolectric.internal.bytecode.InstrumentationConfiguration;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.List;
 
 import spock.lang.Specification;
 
 /**
- * Created by hermanc on 31/3/2017.
+ * Modified RobolectricTestRunner solely to be used by Spock interceptor.
  */
 
 public class ContainedRobolectricTestRunner extends RobolectricTestRunner {
@@ -67,6 +67,16 @@ public class ContainedRobolectricTestRunner extends RobolectricTestRunner {
 
     }
 
+    private Method getMethod(Class<?> clazz, String methodName) {
+        try {
+            return clazz.getMethod(methodName);
+        }
+        catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
     Method createBootstrapedMethod() {
 
         FrameworkMethod placeholderMethod = getPlaceHolderMethod();
@@ -77,16 +87,7 @@ public class ContainedRobolectricTestRunner extends RobolectricTestRunner {
         Class bootstrappedTestClass = sdkEnvironment.bootstrappedClass(
                 getTestClass().getJavaClass());
 
-        final Method bootstrappedMethod;
-        try {
-            // getMethod should always be the "testPlaceholder" method.
-            bootstrappedMethod = bootstrappedTestClass.getMethod(
-                    placeholderMethod.getMethod().getName());
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
-        }
-
-        return bootstrappedMethod;
+        return getMethod(bootstrappedTestClass, placeholderMethod.getMethod().getName());
 
     }
 
@@ -94,6 +95,7 @@ public class ContainedRobolectricTestRunner extends RobolectricTestRunner {
     Override to add itself to doNotAcquireClass, so as to avoid classloader conflict
      */
     @Override
+    @NotNull
     protected InstrumentationConfiguration createClassLoaderConfig(final FrameworkMethod method) {
 
         return new InstrumentationConfiguration.Builder(super.createClassLoaderConfig(method))
@@ -130,13 +132,13 @@ public class ContainedRobolectricTestRunner extends RobolectricTestRunner {
      */
     @Override
     public Config getConfig(Method method) {
-        Annotation[] annotations = specClass.getAnnotations();
+        Config baseConfig = super.getConfig(method);
         Config config = specClass.getAnnotation(Config.class);
         if (config==null) {
-            return super.getConfig(method);
+            return baseConfig;
         }
         else {
-            return new Config.Builder(buildGlobalConfig()).overlay(config).build();
+            return new Config.Builder(baseConfig).overlay(config).build();
         }
 
     }
