@@ -87,7 +87,7 @@ public class RobolectricVersionChecker {
 
         if (!isVersion(ver, acceptedVersions))
             throw new RuntimeException(
-                    "This version of ElectricSpock supports Robolectric 3.3 or 3.4 only. "
+                    "This version of ElectricSpock supports Robolectric 3.3.x to 3.5.x only. "
                             +"Version "+ver+" is detected.");
     }
 

@@ -17,20 +17,18 @@
 
 package hkhc.electricspock.sample
 
+import android.os.Build
 import android.util.Log
 import hkhc.electricspock.ElectricSpecification
 import org.robolectric.Robolectric
 import org.robolectric.annotation.Config
-import spock.lang.Ignore
-import spock.lang.Issue
-import spock.lang.Narrative
-import spock.lang.Title
-import spock.lang.Unroll
+import spock.lang.*
 
 /**
  * Created by herman on 27/12/2016.
  */
 
+@Config(minSdk=16, maxSdk=25)
 @Title("This is a testing spec")
 @Narrative("""
 A for apple
@@ -42,6 +40,7 @@ class HelloWorldSpec extends ElectricSpecification {
     def "This is a test for Log"() {
         given: "This is a given block"
         def mainActivity = Robolectric.buildActivity(MainActivity).create().get()
+        System.err.println("sdk version = " + Build.VERSION.SDK_INT);
 
         when: "This is a when block"
         Log.d("TAG", "Hello")

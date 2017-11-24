@@ -15,32 +15,19 @@
  *
  */
 
-package hkhc.electricspock.sample;
+package hkhc.electricspock.internal;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.robolectric.Robolectric;
-import org.robolectric.RobolectricTestRunner;
-
-import static junit.framework.Assert.assertEquals;
 
 /**
- * Created by herman on 17/3/2017.
+ * Created by herman on 23/11/2017.
  */
 
-@RunWith(RobolectricTestRunner.class)
-public class HelloWorldTest {
+public class AS30Test {
 
     @Test
-    public void test1() {
-
-        MainActivity mainActivity = Robolectric.buildActivity(MainActivity.class).create().get();
-
-        CharSequence text = mainActivity.helloTextView.getText();
-
-        assertEquals(
-                "Hello World!",text);
-
+    public void testOne() {
+        System.out.println("Hello");
     }
 
 }
