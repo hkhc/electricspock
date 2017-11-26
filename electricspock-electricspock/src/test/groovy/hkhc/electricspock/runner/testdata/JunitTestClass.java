@@ -26,7 +26,7 @@ public class JunitTestClass {
 
     }
 
-    @Test
+    @Test(expected=AssertionError.class)
     public void testFail() {
         assertEquals(1,2);
     }

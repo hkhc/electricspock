@@ -15,7 +15,7 @@
  *
  */
 
-apply plugin: 'java'
+apply plugin: 'java-library'
 apply plugin: 'groovy'
 //apply plugin: 'nebula.provided-base'
 
@@ -36,13 +36,11 @@ sourceSets {
 dependencies {
 
     // Workaround for issue https://issuetracker.google.com/issues/65712492
+    // regarding to "Class not found .... Empty test suite" issue
     testRuntimeOnly files("build/classes/groovy/test")
     testRuntimeOnly files("build/classes/groovy/main")
 
-    api "org.robolectric:robolectric:3.5.1", {
-        exclude group:'junit', module: 'junit'
-    }
-
+    api "org.robolectric:robolectric:3.5.1"
     api 'org.codehaus.groovy:groovy-all:2.4.12'
     api "org.spockframework:spock-core:1.1-groovy-2.4"
 
