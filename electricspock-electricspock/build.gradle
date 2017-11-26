@@ -28,17 +28,17 @@ targetCompatibility = "1.7"
 def coreProject = 'electricspock-core'
 
 // Include the classes from core electricspock project
-//def pwd = project.rootDir.toString()+"/"+coreProject
-//jar {
-//    from {
-//        (configurations.compileOnly).findAll {
-//            it.toString().startsWith(pwd)
-//        }
-//        .collect {
-//            it.isDirectory() ? it : zipTree(it)
-//        }
-//    }
-//}
+def pwd = project.rootDir.toString()+"/"+coreProject
+jar {
+    from {
+        (configurations.compileOnly).findAll {
+            it.toString().startsWith(pwd)
+        }
+        .collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+}
 
 dependencies {
 
@@ -54,8 +54,7 @@ dependencies {
     implementation 'org.jetbrains:annotations-java5:15.0'
     implementation 'junit:junit:4.12'
 
-//    compileOnly project(':'+coreProject)
-    api project(':'+coreProject)
+    compileOnly project(':'+coreProject)
 
 }
 
