@@ -21,6 +21,7 @@ apply plugin: 'maven'
 
 artifactId='electricspock'
 group='hkhc.electricspock'
+version = '0.7-as30-dev'
 
 sourceCompatibility = "1.7"
 targetCompatibility = "1.7"
