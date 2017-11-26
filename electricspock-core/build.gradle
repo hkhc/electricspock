@@ -21,6 +21,7 @@ apply plugin: 'groovy'
 
 artifactId='electricspock-core'
 group='hkhc.electricspock'
+version='0.7-as30-dev'
 
 //targetCompatibility = '1.7'
 //sourceCompatibility = '1.7'
