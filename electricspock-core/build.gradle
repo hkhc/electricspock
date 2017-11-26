@@ -17,7 +17,7 @@
 
 apply plugin: 'java'
 apply plugin: 'groovy'
-apply plugin: 'nebula.provided-base'
+//apply plugin: 'nebula.provided-base'
 
 artifactId='electricspock-core'
 group='hkhc.electricspock'
@@ -34,44 +34,23 @@ sourceSets {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
 
     // Workaround for issue https://issuetracker.google.com/issues/65712492
     testRuntimeOnly files("build/classes/groovy/test")
     testRuntimeOnly files("build/classes/groovy/main")
 
-    compile "org.robolectric:robolectric:3.5.1", {
+    implementation "org.robolectric:robolectric:3.5.1", {
         exclude group:'junit', module: 'junit'
     }
 
-    compile 'org.codehaus.groovy:groovy-all:2.4.12'
-    compile "org.spockframework:spock-core:1.1-groovy-2.4"
+    implementation 'org.codehaus.groovy:groovy-all:2.4.12'
+    implementation "org.spockframework:spock-core:1.1-groovy-2.4"
 
-    compile 'org.jetbrains:annotations-java5:15.0'
-    provided 'org.robolectric:android-all:7.1.0_r7-robolectric-0'
-    compile 'junit:junit:4.12'
+    implementation 'org.jetbrains:annotations-java5:15.0'
+    implementation 'org.robolectric:android-all:7.1.0_r7-robolectric-0'
 
-    testCompile 'org.assertj:assertj-core:1.7.1'
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'org.assertj:assertj-core:1.7.1'
 
 }
-
-def runtimeClasspath = project.sourceSets.test.runtimeClasspath
-println "runtimeClasspath" + runtimeClasspath.asPath
-
-def testClass = project.sourceSets.test.output.classesDirs
-for (Object c : testClass) {
-    println "testClass " + c.toString()
-}
-
-def allJava = project.sourceSets.test.allJava.srcDirs
-for (Object c : allJava) {
-    println "allJava " + c.toString()
-}
-
-def allSource = project.sourceSets.test.allSource.srcDirs
-for (Object c : allSource) {
-    println "allSource " + c.toString()
-}
-
-
 

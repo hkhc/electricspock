@@ -114,10 +114,8 @@ public class ElectricSputnik extends Runner implements Filterable, Sortable {
         Constructor interceptorConstructor = getInterceptorConstructor();
 
         for(Method method : sputnik.getClass().getDeclaredMethods()) {
-            System.err.println("register method : " + method.getName());
             Object specInfo = getSpec(method);
             if (specInfo!=null) {
-                System.err.println("has spec info "+method.getName());
                 try {
                     // ElectricSpockInterceptor register itself to SpecInfo on construction,
                     // no need to keep a ref here
