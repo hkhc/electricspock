@@ -51,10 +51,6 @@ public class ContainedRobolectricTestRunner extends RobolectricTestRunner {
 
         if (placeholderMethod==null) {
             List<FrameworkMethod> childs = getChildren();
-            System.err.println("childs count = " + childs.size());
-            for(FrameworkMethod m : childs) {
-                System.err.println("name = " + m.getName());
-            }
             placeholderMethod = childs.get(0);
         }
 
