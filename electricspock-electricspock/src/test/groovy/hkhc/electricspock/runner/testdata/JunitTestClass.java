@@ -7,6 +7,7 @@ import static org.junit.Assert.assertEquals;
 
 /**
  * Created by hermanc on 6/4/2017.
+ * As test data of hkhc.electricspock.runner.DisplayableSpec
  */
 
 public class JunitTestClass {
@@ -26,7 +27,7 @@ public class JunitTestClass {
 
     }
 
-    @Test
+    @Test(expected=AssertionError.class)
     public void testFail() {
         assertEquals(1,2);
     }
