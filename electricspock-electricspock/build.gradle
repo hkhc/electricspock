@@ -15,7 +15,7 @@
  *
  */
 
-apply plugin: 'java'
+apply plugin: 'java-library'
 apply plugin: 'groovy'
 apply plugin: 'maven'
 
@@ -27,33 +27,21 @@ targetCompatibility = "1.7"
 
 def coreProject = 'electricspock-core'
 
-// Include the classes from core electricspock project
-def pwd = project.rootDir.toString()+"/"+coreProject
-jar {
-    from {
-        (configurations.compileOnly).findAll {
-            it.toString().startsWith(pwd)
-        }
-        .collect {
-            it.isDirectory() ? it : zipTree(it)
-        }
-    }
-}
-
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
 
-    compile 'org.codehaus.groovy:groovy-all:2.4.12'
-    compile "org.spockframework:spock-core:1.1-groovy-2.4"
-    compile 'cglib:cglib-nodep:3.2.4'
+    // Workaround for issue https://issuetracker.google.com/issues/65712492
+    // regarding to "Class not found .... Empty test suite" issue
+    testRuntimeOnly files("build/classes/groovy/test")
+    testRuntimeOnly files("build/classes/groovy/main")
 
-//    testCompile 'net.bytebuddy:byte-buddy:1.6.3'
+    api 'org.codehaus.groovy:groovy-all:2.4.12'
+    api "org.spockframework:spock-core:1.1-groovy-2.4"
 
-    compile 'org.jetbrains:annotations-java5:15.0'
-    compile 'junit:junit:4.12'
+    implementation 'cglib:cglib-nodep:3.2.4'
+    implementation 'org.jetbrains:annotations-java5:15.0'
+    implementation 'junit:junit:4.12'
 
-    compileOnly project(':'+coreProject)
-//    compile project(':'+coreProject)
+    implementation project(':electricspock-core')
 
 }
 
