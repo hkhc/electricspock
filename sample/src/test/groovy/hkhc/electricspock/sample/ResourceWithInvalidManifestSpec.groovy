@@ -3,12 +3,14 @@ package hkhc.electricspock.sample
 import android.content.Context
 import hkhc.electricspock.ElectricSpecification
 import org.robolectric.RuntimeEnvironment
-import org.robolectric.annotation.Config
+import spock.lang.Ignore
 
 /**
  * Created by hermanc on 2/8/2017.
  */
-@Config(manifest="non-exist-AndroidManifest.xml")
+//@Config(manifest="non-exist-AndroidManifest.xml")
+@Ignore('''Since Robolectric 3.5, non-exist manifest location will cause IllegalArgumentException, 
+                the test no longer valid''')
 class ResourceWithInvalidManifestSpec extends ElectricSpecification {
 
     def "Test cases shall fall back to default Android resources with non exist AndroidManifest.xml"() {

@@ -15,11 +15,11 @@
  *
  */
 
-package hkhc.electricspock.sample;
+package hkhc.electricspock.sample
 
-import hkhc.electricspock.ElectricSpecification;
-import spock.lang.Title;
-import spock.lang.Unroll;
+import hkhc.electricspock.ElectricSpecification
+import spock.lang.Title
+import spock.lang.Unroll
 
 /**
  * Created by herman on 22/1/2017.
