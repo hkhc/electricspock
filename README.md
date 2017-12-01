@@ -4,21 +4,13 @@
 
 ## What's new
 
-The latest version is 0.7
+The latest version is 0.7. Past history of the library is [over there](history.md).
 
-Version 0.7 tested with Robolectric 3.5.1.
+Version 0.7 tested with Robolectric 3.5.1 and Android Gradle Plugin 3.0.1. 
 
-Version 0.6 supports @Config annotation of Robolectric, and tested with Robolectric 3.4.2.
-
-Version 0.5 Compatible with Robolectric 3.3.x. Reorganize yet again, maximal reuse of code from RobolectricTestRunner
-
-Version 0.4 reorganize code structure, new ElectricSuite class
-
-Version 0.3.1 fix an issue to build with jitpack.
-
-Version 0.3 is built as JAR rather than AAR to make gradle detect `ElectricSpecification` as JUnit class properly.
-
-Version 0.2 is updated to work with Robolectric 3.2.
+_IMPORTANT_: Starting from this version, the library will no longer expose the dependent library implicitly.
+This means you have to add dependencies of Robolectric, Spock Framework and Groovy explicitly.
+This reduce the chances of version conflict in future. See [Installation](#installation-gradle) for details.
 
 For those who stick to Robolectric 3.2, please use version 0.4.1.
 
@@ -47,17 +39,28 @@ Add it in your root build.gradle at the end of repositories:
 	}
 ```
 
-Add the dependency
+Add the dependencies
 
 ```groovy
+	// AGP 3.0
 	dependencies {
-		testCompile 'com.github.hkhc:electricspock:0.7'
+		testImplementation 'com.github.hkhc:electricspock:0.7'
+		testImplementation 'org.robolectric:robolectric:3.5.1'
+		testImplementation 'org.robolectric:shadows-support-v4:3.4-rc2'
+		testImplementation 'org.codehaus.groovy:groovy-all:2.4.12'
+		testImplementation 'org.spockframework:spock-core:1.1-groovy-2.4'
 	}
 ```
-
-Spock, Robolectric and Groovy are dependencies of ElectricSpock,
-so it should work without adding these dependencies to build.gradle,
-but you may override them with the version you prefer.
+```groovy
+	// pre-AGP 3.0
+	dependencies {
+		testCompile 'com.github.hkhc:electricspock:0.7'
+		testCompile 'org.robolectric:robolectric:3.5.1'
+		testCompile 'org.robolectric:shadows-support-v4:3.4-rc2'
+		testCompile 'org.codehaus.groovy:groovy-all:2.4.12'
+		testCompile 'org.spockframework:spock-core:1.1-groovy-2.4'
+	}
+```
 
 Then we may just write Spock specification with `ElectricSpecification`
 class and Robolectric's `@Config` annotation
