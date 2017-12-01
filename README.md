@@ -1,6 +1,7 @@
 # ElectricSpock
 
 [![Release](https://jitpack.io/v/hkhc/electricspock.svg)](https://jitpack.io/#hkhc/electricspock)
+[![Travis CI Build Status](https://travis-ci.org/hkhc/electricspock.svg?branch=master)](https://travis-ci.org/hkhc/electricspock)
 
 ## What's new
 
