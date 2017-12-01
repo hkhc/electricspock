@@ -61,13 +61,14 @@ android {
     }
 }
 
-sourceSets {
-    test {
-        // Class.getResource won't work in unit test without this line.
-        // It ensure the test resources are in the same directory as classes
-        output.resourcesDir = "build/classes/test"
-    }
-}
+// Needed for pre-AGP 3.0 only
+//sourceSets {
+//    test {
+//        // Class.getResource won't work in unit test without this line.
+//        // It ensure the test resources are in the same directory as classes
+//        output.resourcesDir = "build/classes/test"
+//    }
+//}
 
 
 dependencies {
