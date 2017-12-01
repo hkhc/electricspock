@@ -17,6 +17,7 @@
 
 package hkhc.electricspock.sample;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
@@ -29,6 +30,7 @@ import static junit.framework.Assert.assertEquals;
  */
 
 @RunWith(RobolectricTestRunner.class)
+@Ignore
 public class HelloWorldTest {
 
     @Test

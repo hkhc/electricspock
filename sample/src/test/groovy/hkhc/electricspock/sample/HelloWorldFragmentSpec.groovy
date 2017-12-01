@@ -22,6 +22,9 @@ import org.robolectric.util.FragmentTestUtil
  * code folder organization (e.g. src/main/AndroidManifest.xml) The specified AndroidManifest.xml
  * location affect Robolectric to look for merged resources as well. So if some resource is not
  * found in test, it is probably due to incorrect setting of AndroidManifest.xml location.
+ * That said, the Android Gradle plugin merge the AndroidManifest.xml and put the result under
+ * the above mentioned intermediates directory. So the src/main/AndroidManifest.xml affect the test
+ * result.
  *
  */
 

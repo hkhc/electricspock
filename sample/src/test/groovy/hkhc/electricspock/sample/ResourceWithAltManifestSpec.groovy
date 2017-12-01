@@ -12,6 +12,7 @@ import org.robolectric.annotation.Config
  * Created by hermanc on 2/8/2017.
  */
 // Alternate AndroidManifest.xml shall be placed under resource directory
+// see the comment in HelloSpecFragmentSpec.groovy
 @Config(manifest="AndroidManifest-alt.xml")
 
 class ResourceWithAltManifestSpec extends ElectricSpecification {
