@@ -47,7 +47,6 @@ Add the dependencies
 	dependencies {
 		testImplementation 'com.github.hkhc:electricspock:0.7'
 		testImplementation 'org.robolectric:robolectric:3.5.1'
-		testImplementation 'org.robolectric:shadows-support-v4:3.4-rc2'
 		testImplementation 'org.codehaus.groovy:groovy-all:2.4.12'
 		testImplementation 'org.spockframework:spock-core:1.1-groovy-2.4'
 	}
@@ -57,7 +56,6 @@ Add the dependencies
 	dependencies {
 		testCompile 'com.github.hkhc:electricspock:0.7'
 		testCompile 'org.robolectric:robolectric:3.5.1'
-		testCompile 'org.robolectric:shadows-support-v4:3.4-rc2'
 		testCompile 'org.codehaus.groovy:groovy-all:2.4.12'
 		testCompile 'org.spockframework:spock-core:1.1-groovy-2.4'
 	}
