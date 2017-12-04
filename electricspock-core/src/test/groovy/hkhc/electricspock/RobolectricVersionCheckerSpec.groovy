@@ -79,7 +79,7 @@ class RobolectricVersionCheckerSpec extends ElectricSpecification {
             checker.checkRobolectricVersion(ver)
         then:
             def ex = thrown(RuntimeException)
-            ex.message == "This version of ElectricSpock supports Robolectric 3.3.x to 3.5.x only. Version ${ver} is detected." as String
+            ex.message == "This version of ElectricSpock supports Robolectric 3.3.x to 3.6.x only. Version ${ver} is detected." as String
 
         where:
             ver || _
