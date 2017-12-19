@@ -34,7 +34,7 @@ dependencies {
     testRuntimeOnly files("build/classes/groovy/test")
     testRuntimeOnly files("build/classes/groovy/main")
 
-    api 'org.codehaus.groovy:groovy-all:2.4.12'
+    api 'org.codehaus.groovy:groovy-all:2.4.13'
     api "org.spockframework:spock-core:1.1-groovy-2.4"
 
     implementation 'cglib:cglib-nodep:3.2.4'
