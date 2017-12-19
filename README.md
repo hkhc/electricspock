@@ -5,11 +5,11 @@
 
 ## What's new
 
-The latest version is 0.7. Past history of the library is [over there](history.md).
+The latest version is 0.7.1. Past history of the library is [over there](history.md).
 
-Version 0.7 tested with Robolectric 3.5.1 and Android Gradle Plugin 3.0.1. 
+Version 0.7.1 works with Robolectric 3.6.1. (It does not work with Robolectric 3.6)
 
-_IMPORTANT_: Starting from this version, the library will no longer expose the dependent library implicitly.
+_IMPORTANT_: Starting from version 0.7, the library will no longer expose the dependent library implicitly.
 This means you have to add dependencies of Robolectric, Spock Framework and Groovy explicitly.
 This reduce the chances of version conflict in future. See [Installation](#installation-gradle) for details.
 
@@ -23,7 +23,7 @@ The Android test framework [Robolectric](https://github.com/robolectric/robolect
 
 It is heavily based on RoboSpock project. It borrow a lot of code from there, and make some tweak of my own. This project is never possible without the excellent foundation.
 
-Current version (0.7) of the library is tested with Robolectric 3.5.1.
+Current version (0.7.1) of the library is tested with Robolectric 3.6.1.
 
 # Installation (Gradle)
 
@@ -45,8 +45,9 @@ Add the dependencies
 ```groovy
 	// AGP 3.0
 	dependencies {
-		testImplementation 'com.github.hkhc:electricspock:0.7'
-		testImplementation 'org.robolectric:robolectric:3.5.1'
+		testImplementation 'com.github.hkhc:electricspock:0.7.1'
+		testImplementation 'org.robolectric:robolectric:3.6.1'
+		testImplementation 'org.robolectric:shadows-support-v4:3.4-rc2'
 		testImplementation 'org.codehaus.groovy:groovy-all:2.4.12'
 		testImplementation 'org.spockframework:spock-core:1.1-groovy-2.4'
 	}
@@ -54,8 +55,9 @@ Add the dependencies
 ```groovy
 	// pre-AGP 3.0
 	dependencies {
-		testCompile 'com.github.hkhc:electricspock:0.7'
-		testCompile 'org.robolectric:robolectric:3.5.1'
+		testCompile 'com.github.hkhc:electricspock:0.7.1'
+		testCompile 'org.robolectric:robolectric:3.6.1'
+		testCompile 'org.robolectric:shadows-support-v4:3.4-rc2'
 		testCompile 'org.codehaus.groovy:groovy-all:2.4.12'
 		testCompile 'org.spockframework:spock-core:1.1-groovy-2.4'
 	}
