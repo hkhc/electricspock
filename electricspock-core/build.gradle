@@ -40,7 +40,7 @@ dependencies {
     testRuntimeOnly files("build/classes/groovy/test")
     testRuntimeOnly files("build/classes/groovy/main")
 
-    api "org.robolectric:robolectric:3.6.1"
+    api "org.robolectric:robolectric:3.7.1"
     api 'org.codehaus.groovy:groovy-all:2.4.13'
     api "org.spockframework:spock-core:1.1-groovy-2.4"
 
