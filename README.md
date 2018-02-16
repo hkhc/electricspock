@@ -5,23 +5,16 @@
 
 ## What's new
 
-<<<<<<< HEAD
-The latest version is 0.7.1. Past history of the library is [over there](history.md).
-
-Version 0.7.1 works with Robolectric 3.6.1. (It does not work with Robolectric 3.6)
-
-_IMPORTANT_: Starting from version 0.7, the library will no longer expose the dependent library implicitly.
-=======
 The latest version is 0.8. Past history of the library is [over there](history.md).
 
-Version 0.8 tested with Robolectric 3.7 and Android Gradle Plugin 3.0.1
+Version 0.8 tested with Robolectric 3.7.1 and Android Gradle Plugin 3.0.1. There is no real code change. Just update version check.
 
 _IMPORTANT_: Starting from ElectricSpock 0.7, the library will no longer expose the dependent library implicitly.
->>>>>>> - Update for Robolectric 3.7
 This means you have to add dependencies of Robolectric, Spock Framework and Groovy explicitly.
 This reduce the chances of version conflict in future. See [Installation](#installation-gradle) for details.
 
 For those who stick to Robolectric 3.2, please use version 0.4.1.
+
 For those who stick to Robolectric 3.1, please use version 0.1.
 
 ## About
@@ -31,10 +24,14 @@ The Android test framework [Robolectric](https://github.com/robolectric/robolect
 It is heavily based on RoboSpock project. It borrow a lot of code from there, and make some tweak of my own. This project is never possible without the excellent foundation.
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 Current version (0.7.1) of the library is tested with Robolectric 3.6.1.
 =======
 Current version (0.8) of the library is tested with Robolectric 3.7.
 >>>>>>> - Update for Robolectric 3.7
+=======
+Current version (0.8) of the library is tested with Robolectric 3.7.1.
+>>>>>>> - test with Robolectric 3.7.1
 
 # Installation (Gradle)
 
