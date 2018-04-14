@@ -29,7 +29,7 @@ public class RobolectricVersionChecker {
     private String versionKey = "robolectric.version";
 
     // *** update this for version upgrade
-    private String[] acceptedVersions = new String[] {"3.3","3.4", "3.5", "3.6", "3.7"};
+    private String[] acceptedVersions = new String[] {"3.3","3.4", "3.5", "3.6", "3.7", "3.8"};
 
     public RobolectricVersionChecker() {}
 
@@ -87,7 +87,7 @@ public class RobolectricVersionChecker {
 
         if (!isVersion(ver, acceptedVersions))
             throw new RuntimeException(
-                    "This version of ElectricSpock supports Robolectric 3.3.x to 3.6.x only. "
+                    "This version of ElectricSpock supports Robolectric 3.3.x to 3.8.x only. "
                             +"Version "+ver+" is detected.");
     }
 

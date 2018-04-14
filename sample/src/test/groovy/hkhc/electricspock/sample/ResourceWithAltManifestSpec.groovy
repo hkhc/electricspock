@@ -45,7 +45,7 @@ class ResourceWithAltManifestSpec extends ElectricSpecification {
 
 
         then:
-            version==11020000
+            version==12211000
 
     }
 
@@ -56,7 +56,7 @@ class ResourceWithAltManifestSpec extends ElectricSpecification {
         when: "Library resource"
         int googlePlayVersion = context.getResources().getInteger(R.integer.google_play_services_version);
         then:
-        googlePlayVersion == 11020000
+        googlePlayVersion == 12211000
     }
 
 }
