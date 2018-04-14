@@ -1,3 +1,5 @@
+Version 0.8 works with Robolectric 3.7.1.
+
 Version 0.7.1 works with Robolectric 3.6.1. (It does not work with Robolectric 3.6)
 
 Version 0.7 tested with Robolectric 3.5.1 and Android Gradle Plugin 3.0.1. 
