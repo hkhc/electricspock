@@ -26,7 +26,7 @@ import org.junit.runner.manipulation.Sortable;
 import org.junit.runner.manipulation.Sorter;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.model.InitializationError;
-import org.robolectric.internal.SdkEnvironment;
+import org.robolectric.internal.AndroidSandbox;
 import org.spockframework.runtime.Sputnik;
 import org.spockframework.runtime.model.SpecInfo;
 
@@ -48,7 +48,7 @@ import spock.lang.Title;
 
 public class ElectricSputnik extends Runner implements Filterable, Sortable {
 
-    private SdkEnvironment sdkEnvironment;
+    private AndroidSandbox sdkEnvironment;
 
     /* it is used to setup Robolectric infrastructure, and not used to run actual test cases */
     private ContainedRobolectricTestRunner containedRunner;
@@ -65,15 +65,17 @@ public class ElectricSputnik extends Runner implements Filterable, Sortable {
         new SecureRandom(); // this starts up the Poller SunPKCS11-Darwin thread early, outside of any Robolectric classloader
     }
 
-    public ElectricSputnik(Class<? extends Specification> specClass)  throws InitializationError {
+    public ElectricSputnik(Class<? extends Specification> specClass) throws InitializationError {
 
         /* The project is so sensitive to the version of Robolectric, that we strictly check
         its version before proceed
          */
         (new RobolectricVersionChecker()).checkRobolectricVersion();
 
-        containedRunner = new ContainedRobolectricTestRunner(specClass);
+        containedRunner = new ContainedRobolectricTestRunner();
         sdkEnvironment = containedRunner.getContainedSdkEnvironment();
+
+
         specInfoClass = sdkEnvironment.bootstrappedClass(SpecInfo.class);
 
         // Since we have bootstrappedClass we may properly initialize
@@ -84,10 +86,11 @@ public class ElectricSputnik extends Runner implements Filterable, Sortable {
     }
 
     /**
-     *     Sputnik is the test runner for Spock specification. This method Load the spec class and
-     *     Sputnik class with Robolectric sandbox, so that Robolectric can intercept the Android API
-     *     code. That's how we bridge Spock framework and Robolectric together.
-     *     @param specClass the Specification class to be run under Sputnik
+     * Sputnik is the test runner for Spock specification. This method Load the spec class and
+     * Sputnik class with Robolectric sandbox, so that Robolectric can intercept the Android API
+     * code. That's how we bridge Spock framework and Robolectric together.
+     *
+     * @param specClass the Specification class to be run under Sputnik
      */
     private Runner createSputnik(Class<? extends Specification> specClass) {
 
@@ -95,7 +98,7 @@ public class ElectricSputnik extends Runner implements Filterable, Sortable {
 
         try {
 
-            return (Runner)sdkEnvironment
+            return (Runner) sdkEnvironment
                     .bootstrappedClass(Sputnik.class)
                     .getConstructor(Class.class)
                     .newInstance(bootstrappedTestClass);
@@ -113,9 +116,9 @@ public class ElectricSputnik extends Runner implements Filterable, Sortable {
 
         Constructor interceptorConstructor = getInterceptorConstructor();
 
-        for(Method method : sputnik.getClass().getDeclaredMethods()) {
+        for (Method method : sputnik.getClass().getDeclaredMethods()) {
             Object specInfo = getSpec(method);
-            if (specInfo!=null) {
+            if (specInfo != null) {
                 try {
                     // ElectricSpockInterceptor register itself to SpecInfo on construction,
                     // no need to keep a ref here
@@ -135,6 +138,7 @@ public class ElectricSputnik extends Runner implements Filterable, Sortable {
     /**
      * Get the SpecInfo from Specification. However, the SpecInfo instance it return will be under
      * Robolectric sandbox, so it cannot be casted directly to SpecInfo statically.
+     *
      * @param method the getSpec method
      * @return the SpecInfo object loaded under Robolectric sandbox
      */
@@ -144,9 +148,9 @@ public class ElectricSputnik extends Runner implements Filterable, Sortable {
             method.setAccessible(true);
             try {
                 Object specInfo = method.invoke(sputnik);
-                if (specInfo.getClass()!=specInfoClass) {
+                if (specInfo.getClass() != specInfoClass) {
                     throw new RuntimeException("Failed to obtain SpecInfo instance from getSpec method. Instance of '"
-                            +specInfo.getClass().getName()+"' is obtained");
+                            + specInfo.getClass().getName() + "' is obtained");
                 }
                 return specInfo;
             } catch (IllegalAccessException e) {
@@ -154,14 +158,14 @@ public class ElectricSputnik extends Runner implements Filterable, Sortable {
             } catch (InvocationTargetException e) {
                 throw new RuntimeException(e);
             }
-        }
-        else {
+        } else {
             return null;
         }
     }
 
     /**
      * Get a sandboxed constructor of interceptor
+     *
      * @return
      */
     private Constructor getInterceptorConstructor() {
@@ -173,8 +177,7 @@ public class ElectricSputnik extends Runner implements Filterable, Sortable {
                             specInfoClass,
                             ContainedRobolectricTestRunner.class
                     );
-        }
-        catch (NoSuchMethodException e) {
+        } catch (NoSuchMethodException e) {
             // it should not happen in production code as the class
             // ElectricSpockInterceptor is known
             throw new RuntimeException(e);
@@ -182,13 +185,12 @@ public class ElectricSputnik extends Runner implements Filterable, Sortable {
 
     }
 
-
     public Description getDescription() {
 
         Description originalDesc = sputnik.getDescription();
 
         Class<?> testClass = originalDesc.getTestClass();
-        if (testClass==null) throw new RuntimeException("Unexpected null testClass");
+        if (testClass == null) throw new RuntimeException("Unexpected null testClass");
 
         String title = null;
         Annotation[] annotations = testClass.getAnnotations();
@@ -200,9 +202,9 @@ public class ElectricSputnik extends Runner implements Filterable, Sortable {
         }
 
         Description overridedDesc = Description.createSuiteDescription(
-                title==null ? testClass.getName() : title
+                title == null ? testClass.getName() : title
         );
-        for(Description d: originalDesc.getChildren()) {
+        for (Description d : originalDesc.getChildren()) {
             overridedDesc.addChild(d);
         }
 
