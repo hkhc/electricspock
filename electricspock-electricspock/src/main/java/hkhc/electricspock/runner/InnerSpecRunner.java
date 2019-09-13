@@ -17,16 +17,13 @@
 
 package hkhc.electricspock.runner;
 
-import org.junit.Test;
 import org.junit.runner.Description;
-import org.junit.runner.RunWith;
 import org.junit.runner.Runner;
 import org.junit.runners.Suite;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.RunnerBuilder;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
 import java.util.List;
 
 import spock.lang.Title;
@@ -74,15 +71,9 @@ public class InnerSpecRunner extends Suite {
         dumpDescription(0, d);
     }
 
-    private String getSpace(int count) {
-        StringBuilder builder = new StringBuilder();
-        for(int i=0;i<count;i++) builder.append(" ");
-        return builder.toString();
-    }
-
     private void dumpDescription(int level, Description d) {
-        for(Description c : d.getChildren()) {
-            dumpDescription(level+1, c);
+        for (Description c : d.getChildren()) {
+            dumpDescription(level + 1, c);
         }
     }
 
@@ -93,24 +84,23 @@ public class InnerSpecRunner extends Suite {
         Class<?> testClass = d.getTestClass();
         String title = null;
         Annotation[] annotations = null;
-        if (testClass!=null) {
+        if (testClass != null) {
             annotations = testClass.getAnnotations();
             for (Annotation a : annotations) {
                 if (a instanceof Title) {
-                    title = ((Title) a).value() + " ("+testClass.getName()+")";
+                    title = ((Title) a).value() + " (" + testClass.getName() + ")";
                     break;
                 }
             }
         }
-        if (title!=null) {
+        if (title != null) {
             Description newD = Description.createSuiteDescription(title, annotations);
-            for(Description childD : d.getChildren()) {
+            for (Description childD : d.getChildren()) {
                 newD.addChild(Description.createTestDescription(newD.getTestClass(), childD.getDisplayName()));
             }
             dumpDescription(newD);
             return newD;
-        }
-        else {
+        } else {
             System.out.println("title is null");
             return d;
         }

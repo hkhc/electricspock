@@ -31,6 +31,7 @@ class SpecUtils {
 
     /**
      * Find all inner Specification class in a class
+     *
      * @param kClass outer class
      * @return array of inner Specification classes
      */
@@ -38,17 +39,17 @@ class SpecUtils {
 
         Class<?>[] declaredClasses = kClass.getDeclaredClasses();
 
-        Class<?>[] filteredClasses = new Class<?>[declaredClasses.length+1];
+        Class<?>[] filteredClasses = new Class<?>[declaredClasses.length + 1];
         int count = 0;
 
-        for(Class<?> cls : declaredClasses) {
+        for (Class<?> cls : declaredClasses) {
             if (isJUnitClass(cls)) {
                 filteredClasses[count++] = cls;
             }
         }
 
         Class<?>[] resultClasses = new Class<?>[count];
-        System.arraycopy(filteredClasses,0, resultClasses, 0, count);
+        System.arraycopy(filteredClasses, 0, resultClasses, 0, count);
 
         return resultClasses;
     }
@@ -58,10 +59,9 @@ class SpecUtils {
             return true;
         }
         Class<?> superClass = cls.getSuperclass();
-        if (superClass!=null) {
+        if (superClass != null) {
             return isJUnitClass(superClass);
-        }
-        else {
+        } else {
             return false;
         }
     }
@@ -69,15 +69,15 @@ class SpecUtils {
     static boolean isDirectJUnitClass(Class<?> cls) {
 
         Annotation[] annotations = cls.getAnnotations();
-        for(Annotation a : annotations) {
+        for (Annotation a : annotations) {
             if (a instanceof RunWith) {
                 return true;
             }
         }
         Method[] methods = cls.getMethods();
-        for(Method m : methods) {
+        for (Method m : methods) {
             Annotation[] methodAnnos = m.getAnnotations();
-            for(Annotation a : methodAnnos) {
+            for (Annotation a : methodAnnos) {
                 if (a instanceof Test) {
                     return true;
                 }
@@ -90,15 +90,13 @@ class SpecUtils {
     // TODO move it out of this class
     static boolean isExtendedFrom(Class<?> cls, Class<?> targetBaseClass) {
 
-        if (cls==targetBaseClass) {
+        if (cls == targetBaseClass) {
             return true;
-        }
-        else {
+        } else {
             Class<?> superClass = cls.getSuperclass();
-            if (superClass==null) {
+            if (superClass == null) {
                 return false;
-            }
-            else {
+            } else {
                 return isExtendedFrom(superClass, targetBaseClass);
             }
         }
