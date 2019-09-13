@@ -2,7 +2,7 @@ package hkhc.electricspock.sample;
 
 import android.app.Fragment;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +24,7 @@ public class MainFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         ViewGroup vg = (ViewGroup)inflater.inflate(R.layout.fragment_main, null);
-        helloWorldText = (TextView)vg.findViewById(R.id.text);
+        helloWorldText = vg.findViewById(R.id.text);
 
         // Create a banner ad. The ad size and ad unit ID must be set before calling loadAd.
         AdView mAdView = new AdView(getActivity());

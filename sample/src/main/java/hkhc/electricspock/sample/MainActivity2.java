@@ -2,8 +2,7 @@ package hkhc.electricspock.sample;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.widget.TextView;
+import androidx.annotation.Nullable;
 
 /**
  * Created by hermanc on 10/4/2017.

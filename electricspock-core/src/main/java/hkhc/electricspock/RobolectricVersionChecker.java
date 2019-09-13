@@ -29,9 +29,10 @@ public class RobolectricVersionChecker {
     private String versionKey = "robolectric.version";
 
     // *** update this for version upgrade
-    private String[] acceptedVersions = new String[] {"3.3","3.4", "3.5", "3.6", "3.7", "3.8"};
+    private String[] acceptedVersions = new String[]{"4,0", "4.1", "4.2", "4.3"};
 
-    public RobolectricVersionChecker() {}
+    public RobolectricVersionChecker() {
+    }
 
     public RobolectricVersionChecker(String versionFile) {
         this.versionFile = versionFile;
@@ -51,51 +52,42 @@ public class RobolectricVersionChecker {
     }
 
     public String getCurrentRobolectricVersion() {
-
         try {
-
             Properties prop = new Properties();
             prop.load(getClass().getClassLoader().getResourceAsStream(versionFile));
             return prop.getProperty(versionKey);
-        }
-        catch (Throwable t) {
+        } catch (Throwable t) {
             return "Unknown";
         }
-
-
     }
 
     public boolean isVersion(String version, String prefix) {
-
-        if (version==null) return false;
+        if (version == null) return false;
 
         return version.equals(prefix) ||
-                version.indexOf(prefix+".")==0 ||
-                version.indexOf(prefix+"-")==0;
-
+                version.indexOf(prefix + ".") == 0 ||
+                version.indexOf(prefix + "-") == 0;
     }
 
     // return true if any of prefixes is matached.
     public boolean isVersion(String version, String[] prefixes) {
-        for(String p : prefixes) {
+        for (String p : prefixes) {
             if (isVersion(version, p)) return true;
         }
         return false;
     }
 
     public void checkRobolectricVersion(String ver) {
-
         if (!isVersion(ver, acceptedVersions))
             throw new RuntimeException(
-                    "This version of ElectricSpock supports Robolectric 3.3.x to 3.8.x only. "
-                            +"Version "+ver+" is detected.");
+                    "This version of ElectricSpock supports Robolectric 4.0.x to 4.4.x only. "
+                            + "Version " + ver + " is detected. You can downgrade to a previous version " +
+                            "of Electricspock to support older versions of Robolectric");
     }
 
     public void checkRobolectricVersion() {
-
         String ver = getCurrentRobolectricVersion();
         checkRobolectricVersion(ver);
-
     }
 
 }

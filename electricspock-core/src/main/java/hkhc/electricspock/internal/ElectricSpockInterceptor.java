@@ -39,12 +39,12 @@ public class ElectricSpockInterceptor extends AbstractMethodInterceptor {
     }
 
 
-
     /**
-        Migrate from RobolectricTestRunner.methodBlock
-        Replace the classloader by Robolectric's when executing a specification. Restore it when
-        execution finished.
-        @param invocation The method invocation to be intercept
+     * Migrate from RobolectricTestRunner.methodBlock
+     * Replace the classloader by Robolectric's when executing a specification. Restore it when
+     * execution finished.
+     *
+     * @param invocation The method invocation to be intercept
      */
     @Override
     public void interceptSpecExecution(IMethodInvocation invocation) throws Throwable {
@@ -54,12 +54,11 @@ public class ElectricSpockInterceptor extends AbstractMethodInterceptor {
 
         try {
             containedTestRunner.containedBeforeTest();
-        }
-        catch (Throwable e) {
+        } catch (Throwable e) {
             throw new RuntimeException(e);
         }
 
-        // todo: this try/finally probably isn't right -- should mimic RunAfters? [xw]
+        // todo: this try/finally probably isn't right -- should mimic RunAfters ? [xw]
         try {
             invocation.proceed();
         } finally {
@@ -69,7 +68,5 @@ public class ElectricSpockInterceptor extends AbstractMethodInterceptor {
                 Thread.currentThread().setContextClassLoader(ElectricSputnik.class.getClassLoader());
             }
         }
-
     }
-
 }

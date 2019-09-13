@@ -26,7 +26,7 @@ import org.junit.Ignore
 import org.junit.Test
 import org.junit.runners.model.FrameworkMethod
 import org.robolectric.annotation.Config
-import org.robolectric.internal.SdkEnvironment
+import org.robolectric.internal.AndroidSandbox
 import org.robolectric.internal.bytecode.InstrumentationConfiguration
 
 import java.lang.reflect.Method
@@ -38,7 +38,7 @@ import static org.assertj.core.api.Assertions.assertThat
  */
 class ContainedRobolectricTestRunnerTest {
 
-    ContainedRobolectricTestRunner runner = null;
+    ContainedRobolectricTestRunner runner = null
 
     @Before
     void setUp() {
@@ -62,7 +62,7 @@ class ContainedRobolectricTestRunnerTest {
     void "getContainedSdkEnvironment shall return non-null object"() throws Exception {
 
         // when
-        SdkEnvironment sdkEnv = runner.getContainedSdkEnvironment()
+        AndroidSandbox sdkEnv = runner.getContainedSdkEnvironment()
 
         // then
         assertThat sdkEnv isNotNull()
@@ -73,7 +73,7 @@ class ContainedRobolectricTestRunnerTest {
     void "SdkEnvironment.getBootstrap shall return a class object with different class loader"() {
 
         // given
-        SdkEnvironment sdkEnv = runner.getContainedSdkEnvironment()
+        AndroidSandbox sdkEnv = runner.getContainedSdkEnvironment()
 
         // when
         Class c = sdkEnv.bootstrappedClass(ElectricSpecification)
