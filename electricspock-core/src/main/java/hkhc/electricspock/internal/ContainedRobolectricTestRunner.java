@@ -97,12 +97,11 @@ public class ContainedRobolectricTestRunner extends RobolectricTestRunner {
         return sdkEnvironment;
     }
 
-    void containedBeforeTest() throws Throwable {
+    public void containedBeforeTest() throws Throwable {
         super.beforeTest(getContainedSdkEnvironment(), getPlaceHolderMethod(), getBootstrapedMethod());
     }
 
-
-    void containedAfterTest() {
+    public void containedAfterTest() {
         super.afterTest(getPlaceHolderMethod(), getBootstrapedMethod());
     }
 
